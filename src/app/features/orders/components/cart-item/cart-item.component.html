@@ -1,0 +1,41 @@
+<div class="cart-item flex items-center p-4 border-b">
+  <div class="cart-item-image w-20 h-20 mr-4">
+    <img [src]="item.imageUrl || '/assets/images/placeholder.webp'"
+         [alt]="item.productName"
+         class="w-full h-full object-cover rounded">
+  </div>
+
+  <div class="cart-item-details flex-grow">
+    <h3 class="text-lg font-semibold">{{ item.productName }}</h3>
+    <p class="text-sm text-gray-600">Vendido por: {{ item.producerName }}</p>
+    <p class="text-lg font-bold text-green-700">${{ item.price.toFixed(2) }}</p>
+  </div>
+
+  <div class="cart-item-quantity flex items-center">
+    <button
+      class="quantity-btn decrease bg-gray-200 px-3 py-1 rounded-l"
+      (click)="onQuantityChange(item.quantity - 1)"
+    >-</button>
+
+    <span class="quantity-value px-4 py-1 bg-gray-100">{{ item.quantity }}</span>
+
+    <button
+      class="quantity-btn increase bg-gray-200 px-3 py-1 rounded-r"
+      (click)="onQuantityChange(item.quantity + 1)"
+    >+</button>
+  </div>
+
+  <div class="cart-item-subtotal text-right ml-6">
+    <p class="text-sm text-gray-600">Subtotal:</p>
+    <p class="text-lg font-bold">${{ item.subtotal.toFixed(2) }}</p>
+  </div>
+
+  <button
+    class="cart-item-remove ml-4 text-red-500"
+    (click)="onRemove()"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+    </svg>
+  </button>
+</div>

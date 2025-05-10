@@ -1,0 +1,11 @@
+<div class="error-container">
+  <div class="error-content">
+    <h1 class="error-code">{{ errorCode }}</h1>
+    <h2 class="error-message">{{ errorMessage }}</h2>
+    <p class="error-description">{{ errorDescription }}</p>
+    <div class="action-buttons">
+      <button class="btn-primary" [routerLink]="['/home']">Volver al inicio</button>
+      <button class="btn-secondary" (click)="window.history.back()">Volver atrás</button>
+    </div>
+  </div>
+</div>

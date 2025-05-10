@@ -1,0 +1,5 @@
+export const PERFILES = {
+  ADMIN: 'ROLE_ADMIN',
+  PRODUCER: 'ROLE_PRODUCER',
+  CLIENT: 'ROLE_CLIENT',
+}

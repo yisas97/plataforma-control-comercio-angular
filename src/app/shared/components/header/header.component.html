@@ -1,0 +1,30 @@
+<header class="app-header">
+  <div class="header-left">
+    <button
+      class="menu-toggle-btn"
+      (click)="toggleSidebarEvent()"
+      [class.active]="isSidebarOpen">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="tooltip">Alternar menú</span>
+    </button>
+  </div>
+
+  <div class="header-right">
+    <div class="user-menu" (click)="toggleUserMenu()">
+      <div class="user-avatar">
+        <img [src]="userAvatar || 'assets/images/default-avatar.png'" alt="Avatar">
+      </div>
+      <span class="user-name">{{ userName }}</span>
+
+      @if (userMenuOpen) {
+        <div class="dropdown-menu">
+          <a routerLink="/{{ userBasePath }}/profile">Mi Perfil</a>
+          <a routerLink="/{{ userBasePath }}/settings">Configuración</a>
+          <a (click)="logout()">Cerrar Sesión</a>
+        </div>
+      }
+    </div>
+  </div>
+</header>

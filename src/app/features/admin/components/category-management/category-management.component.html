@@ -1,0 +1,29 @@
+<app-template-mantenimiento
+  title="Mantenimiento de Categorías"
+  [items]="categories"
+  [cols]="columns"
+  [loading]="loading"
+  [formTemplate]="formTmpl"
+  [tableClass]="'p-datatable-gridlines p-datatable-sm p-table-light'"
+  (save)="saveCategory($event)"
+  (delete)="deleteCategory($event)">
+</app-template-mantenimiento>
+
+<!-- Template para el formulario de categoría -->
+<ng-template #formTmpl let-category>
+  <div>
+    <div class="m-2">
+      <label class="m-1" for="name">Nombre</label>
+      <input id="name" type="text" pInputText [(ngModel)]="category.name" required>
+    </div>
+    <div class="m-2">
+      <label class="m-1" for="description">Descripción</label>
+      <input id="description" pInputText  [(ngModel)]="category.description">
+    </div>
+    <div class="checkbox m-2">
+      <label class="m-1" for="active">Activo</label>
+      <p-checkbox id="active" [(ngModel)]="category.active" [binary]="true" inputId="active"></p-checkbox>
+
+    </div>
+  </div>
+</ng-template>

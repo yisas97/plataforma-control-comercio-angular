@@ -1,0 +1,11 @@
+<p-dialog [(visible)]="visible" [header]="header" [modal]="true"
+          [style]="{width: '450px'}" [draggable]="false" [resizable]="false">
+  <p>{{message}}</p>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" icon="pi pi-times"
+              styleClass="p-button-text" (click)="onCancel()"></p-button>
+    <p-button label="{{confirmLabel}}" icon="{{confirmIcon}}"
+              [styleClass]="confirmClass" (click)="onConfirm()"></p-button>
+  </ng-template>
+</p-dialog>

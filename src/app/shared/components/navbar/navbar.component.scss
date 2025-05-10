@@ -1,0 +1,29 @@
+.nav-link {
+  position: relative;
+
+  &:after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -4px;
+    left: 0;
+    background-color: #EAB308; // Color amarillo
+    transition: width 0.3s ease;
+  }
+
+  &:hover:after, &.active:after {
+    width: 100%;
+  }
+}
+
+// Estilos para transiciones suaves del menú móvil
+.mobile-menu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+
+  &.open {
+    max-height: 500px;
+  }
+}

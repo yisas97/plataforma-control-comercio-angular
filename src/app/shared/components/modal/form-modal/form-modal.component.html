@@ -1,0 +1,12 @@
+<p-dialog [(visible)]="visible" [header]="header" [modal]="true"
+          [style]="{width: '450px'}" [draggable]="false" [resizable]="false" [closable]="false">
+  <ng-container *ngIf="formTemplate && item">
+    <ng-container *ngTemplateOutlet="formTemplate; context: {$implicit: item}"></ng-container>
+  </ng-container>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" icon="pi pi-times"
+              styleClass="p-button-text" (click)="onCancel()"></p-button>
+    <p-button label="Guardar" icon="pi pi-check" (click)="onSave()"></p-button>
+  </ng-template>
+</p-dialog>

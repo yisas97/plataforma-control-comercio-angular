@@ -1,0 +1,79 @@
+<div class="orders-container">
+  <h1 class="text-3xl font-bold mb-8">Mis Pedidos</h1>
+
+  <div *ngIf="isLoading()" class="flex justify-center py-16">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Cargando...</span>
+    </div>
+  </div>
+
+  <ng-container *ngIf="!isLoading()">
+    <div *ngIf="orders().length === 0" class="empty-orders text-center py-16">
+      <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+      </svg>
+      <h2 class="text-2xl font-medium mt-4 mb-2">No tienes pedidos</h2>
+      <p class="text-gray-600 mb-8">Aún no has realizado ningún pedido en nuestra plataforma</p>
+      <a routerLink="/productos" class="inline-block bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors">
+        Ver productos
+      </a>
+    </div>
+
+    <div *ngIf="orders().length > 0" class="orders-list space-y-6">
+      <a
+        *ngFor="let order of orders()"
+        [routerLink]="['/pedidos', order.id]"
+        class="order-card block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+      >
+        <div class="order-header grid grid-cols-3 lg:grid-cols-6 gap-4 p-4 border-b border-gray-200">
+          <div class="order-number col-span-3 lg:col-span-2">
+            <span class="block text-sm text-gray-600">Pedido</span>
+            <span class="font-medium">{{ order.orderNumber }}</span>
+          </div>
+
+          <div class="order-date lg:col-span-1">
+            <span class="block text-sm text-gray-600">Fecha</span>
+            <span class="font-medium">{{ formatDate(order.orderDate) }}</span>
+          </div>
+
+          <div class="order-status lg:col-span-1">
+            <span class="block text-sm text-gray-600">Estado</span>
+            <span [class]="'inline-block px-3 py-1 rounded-full text-xs ' + getStatusColor(order.status)">
+              {{ getStatusText(order.status) }}
+            </span>
+          </div>
+
+          <div class="order-total lg:col-span-2 text-right">
+            <span class="block text-sm text-gray-600">Total</span>
+            <span class="font-bold text-green-700">${{ order.total.toFixed(2) }}</span>
+          </div>
+        </div>
+
+        <div class="order-items grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+          <div class="order-items-list">
+            <div class="text-sm text-gray-600 mb-2">Productos</div>
+            <div class="space-y-2">
+              <div *ngFor="let item of order.items.slice(0, 2)" class="flex items-center">
+                <span class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs mr-2">
+                  {{ item.quantity }}
+                </span>
+                <span class="truncate">{{ item.productName }}</span>
+              </div>
+
+              <div *ngIf="order.items.length > 2" class="text-sm text-gray-600">
+                + {{ order.items.length - 2 }} productos más
+              </div>
+            </div>
+          </div>
+
+          <div class="order-actions text-right">
+            <div class="text-sm text-gray-600 mb-2">Acciones</div>
+            <span class="inline-block text-sm font-medium text-green-600">
+              Ver detalles →
+            </span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </ng-container>
+</div>

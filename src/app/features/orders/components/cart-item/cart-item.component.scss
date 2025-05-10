@@ -1,0 +1,25 @@
+.cart-item {
+  transition: background-color 0.2s;
+}
+
+.cart-item:hover {
+  background-color: #f9fafb;
+}
+
+.quantity-btn {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.quantity-btn:hover {
+  background-color: #e5e7eb;
+}
+
+.cart-item-remove {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.cart-item-remove:hover {
+  color: #b91c1c;
+}
