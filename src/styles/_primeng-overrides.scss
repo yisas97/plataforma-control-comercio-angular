@@ -33,6 +33,14 @@
       .p-dropdown {
         margin-right: $spacing-md;
       }
+
+      // FIX: Mejorar la posición del dropdown de paginación
+      .p-paginator-rpp-options {
+        .p-dropdown-panel {
+          z-index: 1000 !important;
+          transform: none !important;
+        }
+      }
     }
 
     &.p-datatable-sm {
@@ -127,6 +135,7 @@
     .p-dropdown-panel {
       border-radius: $border-radius;
       box-shadow: $shadow-md;
+      z-index: 1000 !important; // FIX: Asegurar que el dropdown aparezca sobre otros elementos
 
       .p-dropdown-items {
         padding: $spacing-xs 0;
@@ -146,4 +155,20 @@
       }
     }
   }
+}
+
+// Estos estilos deben estar fuera del selector :host para que apliquen globalmente
+// FIX: Aplicar globalmente para todos los dropdowns de paginación
+.p-dropdown-panel {
+  z-index: 1000 !important;
+  transform: none !important;
+}
+
+.p-dropdown-items-wrapper {
+  max-height: 200px;
+}
+
+// FIX: Para asegurar que el overlay de PrimeNG esté por encima de todo
+.p-component-overlay {
+  z-index: 999 !important;
 }

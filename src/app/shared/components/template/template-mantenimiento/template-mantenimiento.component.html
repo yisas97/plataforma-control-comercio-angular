@@ -1,6 +1,7 @@
 <div class="surface-card p-4 shadow-2 border-round">
-  <div class="flex justify-content-between align-items-center mb-3">
+  <div class="header-container mb-3">
     <h1 class="text-gray-900 text-2xl font-medium m-0">{{title}}</h1>
+    <div class="flex-spacer"></div>
     <p-button label="Nuevo" icon="pi pi-plus" (click)="onAdd()"
               styleClass="p-button-success"></p-button>
   </div>
@@ -30,7 +31,8 @@
     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
     [showCurrentPageReport]="true"
     [tableStyle]="{'min-width': '100%'}"
-    styleClass="p-datatable-sm p-datatable-gridlines">
+    styleClass="p-datatable-sm p-datatable-gridlines"
+    dropdownAppendTo="body">
 
     <ng-template pTemplate="header">
       <tr>

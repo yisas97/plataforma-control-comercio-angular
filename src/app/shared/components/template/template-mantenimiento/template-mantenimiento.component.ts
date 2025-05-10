@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output, TemplateRef, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild} from '@angular/core';
 import {DialogModule} from 'primeng/dialog';
 import {Table, TableModule} from 'primeng/table';
 import {ButtonModule} from 'primeng/button';
@@ -40,7 +40,7 @@ export interface ColumnDefinition {
   standalone: true,
   styleUrl: './template-mantenimiento.component.scss'
 })
-export class TemplateMantenimientoComponent<T extends { id?: number }> {
+export class TemplateMantenimientoComponent<T extends { id?: number }> implements OnInit, AfterViewInit{
   @ViewChild('dt') table!: Table;
 
   @Input() title: string = 'Mantenimiento';
@@ -70,6 +70,20 @@ export class TemplateMantenimientoComponent<T extends { id?: number }> {
 
   ngOnInit() {
     this.globalFilterFields = this.cols.map(col => col.field);
+  }
+
+  ngAfterViewInit() {
+    // Asegura que los dropdowns de paginación se muestren correctamente
+    if (this.table) {
+      const paginatorEl = this.table.el.nativeElement.querySelector('.p-paginator-bottom');
+      if (paginatorEl) {
+        const dropdownEl = paginatorEl.querySelector('.p-dropdown');
+        if (dropdownEl) {
+          // Establece el appendTo a "body" para que se muestre correctamente
+          dropdownEl.setAttribute('appendTo', 'body');
+        }
+      }
+    }
   }
 
   onGlobalFilter(event: Event) {

@@ -1,52 +1,57 @@
-// app-layout.component.scss
-:host {
-  display: block;
-  height: 100vh;
-  width: 100%;
-}
-
 .app-layout {
   display: flex;
-  height: 100%;
-
-  &.sidebar-collapsed {
-    .sidebar {
-      width: 64px;
-
-      // Cualquier otro estilo que necesites cambiar cuando el sidebar está colapsado
-    }
-
-    .main-content {
-      margin-left: 64px;
-    }
-  }
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
 }
 
 .sidebar {
-  position: fixed;
-  height: 100%;
-  z-index: 100;
-  width: 260px; // Asegúrate de definir el ancho aquí
-  transition: width 0.3s ease; // Añade transición para animar el cambio
+  flex: 0 0 auto;
+  width: 260px;
+  transition: width 0.3s ease;
+  height: 100vh; /* IMPORTANTE: Altura completa para la pantalla */
+  position: sticky; /* Mantiene el sidebar fijo al hacer scroll */
+  top: 0;
+  left: 0;
+  overflow-y: auto; /* Permite desplazamiento vertical dentro del sidebar */
+  overflow-x: hidden; /* Evita desplazamiento horizontal */
+}
+
+.sidebar-collapsed .sidebar {
+  width: 80px;
 }
 
 .main-content {
-  flex: 1;
-  margin-left: 260px;
-  transition: margin-left 0.3s ease;
-  background-color: #f8fafc;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  min-height: 100%; // Asegura que ocupe toda la altura
+  width: calc(100% - 260px);
+  transition: width 0.3s ease;
+  min-height: 100vh; /* Asegura que el contenido tenga la altura completa */
+  position: relative; /* Contexto de posicionamiento para elementos absolutos */
+}
+
+.sidebar-collapsed .main-content {
+  width: calc(100% - 80px);
 }
 
 .page-content {
-  flex: 1;
-  padding: 24px;
-  overflow-y: auto;
+  flex: 1 1 auto;
+  padding: 20px;
+  overflow-y: auto; /* Permite desplazamiento vertical */
+  background-color: #f7f9fc;
+  min-height: calc(100vh - 60px - 64px); /* Altura de viewport - altura de header - altura del footer */
+  position: relative; /* Contexto de posicionamiento para elementos internos */
+}
+.footer {
+  flex: 0 0 auto;
+  z-index: 10;
 }
 
-.footer {
-  // Estilos para el footer
-  width: 100%;
+:host ::ng-deep .p-dropdown-panel {
+  z-index: 1000 !important;
+}
+
+:host ::ng-deep .p-component-overlay {
+  z-index: 999 !important;
 }
