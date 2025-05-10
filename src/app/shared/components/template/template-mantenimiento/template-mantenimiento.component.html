@@ -1,4 +1,3 @@
-<!-- template-mantenimiento.component.html -->
 <div class="surface-card p-4 shadow-2 border-round">
   <div class="flex w-full items-center mb-3">
     <h1 class="text-gray-900 text-2xl font-medium m-0">{{title}}</h1>
@@ -8,20 +7,34 @@
   </div>
 
   <p-table
+    #dt
     [value]="items"
     [loading]="loading"
     [paginator]="true"
     [rows]="10"
     [rowsPerPageOptions]="[5,10,25,50]"
     [globalFilterFields]="globalFilterFields"
-    [styleClass]="tableClass">
+    [styleClass]="tableClass"
+    responsiveLayout="scroll">
+
+    <ng-template pTemplate="caption">
+      <div class="flex justify-content-between align-items-center">
+        <div>
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input pInputText type="text" placeholder="Buscar..."
+                   (input)="onGlobalFilter($event)" />
+          </span>
+        </div>
+      </div>
+    </ng-template>
 
     <ng-template pTemplate="header">
       <tr>
         <th *ngFor="let col of cols" [ngClass]="{'text-right': col.type === 'number' || col.type === 'decimal' || col.type === 'currency'}">
           {{col.header}}
         </th>
-        <th>Acciones</th>
+        <th style="width:120px">Acciones</th>
       </tr>
     </ng-template>
 
@@ -36,15 +49,25 @@
           </span>
         </td>
         <td>
-          <ng-container *ngIf="actionTemplate; else defaultActions">
-            <ng-container *ngTemplateOutlet="actionTemplate; context: {$implicit: rowData}"></ng-container>
-          </ng-container>
-          <ng-template #defaultActions>
-            <p-button icon="pi pi-pencil" severity="success" class="mr-2"
-                      (click)="onEdit(rowData)"></p-button>
-            <p-button icon="pi pi-trash" severity="danger"
-                      (click)="onDeleteClick(rowData)"></p-button>
-          </ng-template>
+          <div class="flex gap-2">
+            <ng-container *ngIf="actionTemplate; else defaultActions">
+              <ng-container *ngTemplateOutlet="actionTemplate; context: {$implicit: rowData}"></ng-container>
+            </ng-container>
+            <ng-template #defaultActions>
+              <p-button icon="pi pi-pencil" severity="info" size="small"
+                        (click)="onEdit(rowData)"></p-button>
+              <p-button icon="pi pi-trash" severity="danger" size="small"
+                        (click)="onDeleteClick(rowData)"></p-button>
+            </ng-template>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="cols.length + 1" class="text-center p-4">
+          No se encontraron registros.
         </td>
       </tr>
     </ng-template>
@@ -56,19 +79,7 @@
     [header]="getFormHeader()"
     [item]="selectedItem"
     [formTemplate]="formTemplate"
-    (save)="onSave($event)"
+    [formIsValid]="form?.valid || false"
+    (save)="onSave()"
     (cancel)="onCancel()">
   </app-form-modal>
-
-  <!-- Confirmation Modal Component -->
-  <app-confirmation-modal
-    [visible]="showDeleteModal"
-    header="Confirmar Eliminación"
-    message="¿Está seguro que desea eliminar este registro? Esta acción no se puede deshacer."
-    confirmLabel="Eliminar"
-    confirmIcon="pi pi-trash"
-    confirmClass="p-button-danger"
-    (confirm)="onDeleteConfirm()"
-    (cancel)="showDeleteModal = false">
-  </app-confirmation-modal>
-</div>

@@ -2,16 +2,19 @@ import { Component } from '@angular/core';
 import {ColumnDefinition, TemplateMantenimientoComponent} from '../../../../shared/components';
 import {Category} from '../../model/category.model';
 import {CategoryService} from '../../services';
-import {Checkbox} from 'primeng/checkbox';
-import {FormsModule} from '@angular/forms';
-import {InputText} from 'primeng/inputtext';
+import {Checkbox, CheckboxModule} from 'primeng/checkbox';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {InputText, InputTextModule} from 'primeng/inputtext';
+import {CommonModule} from '@angular/common';
 
 @Component({
   selector: 'app-category-management',
   imports: [
+    CommonModule,
     TemplateMantenimientoComponent,
-    Checkbox,
-    FormsModule,
+    CheckboxModule,
+    ReactiveFormsModule,
+    InputTextModule,
     InputText
   ],
   templateUrl: './category-management.component.html',
@@ -22,6 +25,8 @@ export class CategoryManagementComponent {
 
   categories: Category[] = [];
   loading: boolean = false;
+  categoryForm!: FormGroup;
+
   columns: ColumnDefinition[] = [
     {
       field: 'id',
@@ -52,10 +57,33 @@ export class CategoryManagementComponent {
     },
   ];
 
-  constructor(private categoryService: CategoryService) {}
+  constructor(
+    private categoryService: CategoryService,
+    private fb: FormBuilder
+  ) { }
 
   ngOnInit() {
+    this.categoryForm = this.createForm();
     this.loadCategories();
+  }
+
+  createForm(): FormGroup {
+    return this.fb.group({
+      name: ['', [Validators.required, Validators.maxLength(100)]],
+      description: ['', Validators.maxLength(500)],
+      active: [true]
+    });
+  }
+
+  initForm(category: Category) {
+    this.categoryForm.reset();
+    if (category) {
+      this.categoryForm.patchValue({
+        name: category.name || '',
+        description: category.description || '',
+        active: category.active === undefined ? true : category.active
+      });
+    }
   }
 
   loadCategories() {
@@ -73,21 +101,40 @@ export class CategoryManagementComponent {
   }
 
   saveCategory(category: Category) {
-    if (category.id) {
-      this.categoryService.updateCategory(category.id,category).subscribe(() => {
-        this.loadCategories();
+    // Aquí combinamos los datos del formulario con el objeto category
+    const formValues = this.categoryForm.value;
+    const updatedCategory = { ...category, ...formValues };
+
+    if (updatedCategory.id) {
+      this.categoryService.updateCategory(updatedCategory.id, updatedCategory).subscribe({
+        next: () => {
+          this.loadCategories();
+        },
+        error: (error) => {
+          console.error('Error al actualizar la categoría', error);
+        }
       });
     } else {
-      this.categoryService.createCategory(category).subscribe(() => {
-        this.loadCategories();
+      this.categoryService.createCategory(updatedCategory).subscribe({
+        next: () => {
+          this.loadCategories();
+        },
+        error: (error) => {
+          console.error('Error al crear la categoría', error);
+        }
       });
     }
   }
 
   deleteCategory(category: Category) {
     if (category.id) {
-      this.categoryService.deleteCategory(category.id).subscribe(() => {
-        this.loadCategories();
+      this.categoryService.deleteCategory(category.id).subscribe({
+        next: () => {
+          this.loadCategories();
+        },
+        error: (error) => {
+          console.error('Error al eliminar la categoría', error);
+        }
       });
     }
   }

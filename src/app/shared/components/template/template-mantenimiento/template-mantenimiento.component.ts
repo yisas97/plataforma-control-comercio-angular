@@ -1,9 +1,9 @@
-import {Component, EventEmitter, Input, Output, TemplateRef} from '@angular/core';
+import {Component, EventEmitter, Input, Output, TemplateRef, ViewChild} from '@angular/core';
 import {DialogModule} from 'primeng/dialog';
-import {TableModule} from 'primeng/table';
+import {Table, TableModule} from 'primeng/table';
 import {ButtonModule} from 'primeng/button';
 import {CommonModule} from '@angular/common';
-import {FormsModule} from '@angular/forms';
+import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {CheckboxModule} from 'primeng/checkbox';
 import {ConfirmationModalComponent, FormModalComponent} from '../../modal';
@@ -27,20 +27,21 @@ export interface ColumnDefinition {
   selector: 'app-template-mantenimiento',
   imports: [
     CommonModule,
-    FormsModule,
+    ReactiveFormsModule,
     TableModule,
     ButtonModule,
     DialogModule,
     InputTextModule,
     CheckboxModule,
-    FormModalComponent,
-    ConfirmationModalComponent,
+    FormModalComponent
   ],
   templateUrl: './template-mantenimiento.component.html',
   standalone: true,
   styleUrl: './template-mantenimiento.component.scss'
 })
 export class TemplateMantenimientoComponent<T extends { id?: number }> {
+  @ViewChild('dt') table!: Table;
+
   @Input() title: string = 'Mantenimiento';
   @Input() items: T[] = [];
   @Input() cols: ColumnDefinition[] = [];
@@ -48,12 +49,14 @@ export class TemplateMantenimientoComponent<T extends { id?: number }> {
   @Input() actionTemplate: TemplateRef<any> | null = null;
   @Input() formTemplate: TemplateRef<any> | null = null;
   @Input() tableClass: string = 'p-datatable-gridlines p-datatable-sm';
+  @Input() form: FormGroup | null = null;
 
   @Output() add = new EventEmitter<void>();
   @Output() edit = new EventEmitter<T>();
   @Output() delete = new EventEmitter<T>();
   @Output() save = new EventEmitter<T>();
   @Output() cancel = new EventEmitter<void>();
+  @Output() formInit = new EventEmitter<T>();
 
   selectedItem: T | null = null;
   showFormModal: boolean = false;
@@ -61,21 +64,31 @@ export class TemplateMantenimientoComponent<T extends { id?: number }> {
   itemToDelete: T | null = null;
 
   globalFilterFields: string[] = [];
+  formIsValid: boolean = false;
 
   ngOnInit() {
     this.globalFilterFields = this.cols.map(col => col.field);
+  }
+
+  onGlobalFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    if (this.table) {
+      this.table.filterGlobal(filterValue, 'contains');
+    }
   }
 
   onAdd(): void {
     this.selectedItem = {} as T;
     this.showFormModal = true;
     this.add.emit();
+    this.formInit.emit(this.selectedItem);
   }
 
   onEdit(item: T): void {
     this.selectedItem = {...item as object} as T;
     this.showFormModal = true;
     this.edit.emit(item);
+    this.formInit.emit(this.selectedItem);
   }
 
   onDeleteClick(item: T): void {
@@ -87,20 +100,32 @@ export class TemplateMantenimientoComponent<T extends { id?: number }> {
     if (this.itemToDelete) {
       this.delete.emit(this.itemToDelete);
     }
+    this.showDeleteModal = false;
   }
 
-  onSave(item: T): void {
-    this.save.emit(item);
+  onSave(): void {
+    if (this.form && this.form.valid && this.selectedItem) {
+      // Combinamos los valores del formulario con el item seleccionado
+      const formValues = this.form.value;
+      const updatedItem = { ...this.selectedItem, ...formValues };
+      this.save.emit(updatedItem);
+      this.showFormModal = false;
+    }
   }
 
   onCancel(): void {
     this.cancel.emit();
+    this.form?.reset();
   }
 
   getFormHeader(): string {
     return this.selectedItem && 'id' in this.selectedItem && this.selectedItem.id
       ? 'Editar'
       : 'Nuevo';
+  }
+
+  updateFormValidity(isValid: boolean): void {
+    this.formIsValid = isValid;
   }
 
   formatCellValue(value: any, col: ColumnDefinition): string {
