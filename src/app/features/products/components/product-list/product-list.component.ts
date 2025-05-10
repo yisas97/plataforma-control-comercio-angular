@@ -29,7 +29,7 @@ export class ProductListComponent implements OnInit {
 
   loadProducts(): void {
     this.isLoading.set(true);
-    this.productService.getProducts().subscribe({
+    this.productService.getProducerProducts().subscribe({
       next: (data) => {
         this.products.set(data);
         this.isLoading.set(false);

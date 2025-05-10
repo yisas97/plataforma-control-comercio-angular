@@ -18,22 +18,29 @@ import {ReactiveFormsModule} from '@angular/forms';
   styleUrl: './form-modal.component.scss'
 })
 export class FormModalComponent<T> {
-  @Input() visible: boolean = false;
-  @Output() visibleChange = new EventEmitter<boolean>();
   @Input() header: string = 'Formulario';
-  @Input() item: T | null = null;
+  @Input() visible: boolean = false;
   @Input() formTemplate: TemplateRef<any> | null = null;
   @Input() formIsValid: boolean = false;
+  @Input() item: any = null;
+  @Input() saveLabel: string = 'Guardar';
+  @Input() cancelLabel: string = 'Cancelar';
+  @Input() saveIcon: string = 'pi pi-check';
+  @Input() cancelIcon: string = 'pi pi-times';
+  @Input() width: string = '70%';
 
-  @Output() save = new EventEmitter<T>();
+  @Output() visibleChange = new EventEmitter<boolean>();
+  @Output() save = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
 
-  onSave(): void {
-    if (this.item) {
-      this.save.emit(this.item);
-    }
-    this.visible = false;
+  onHide(): void {
     this.visibleChange.emit(false);
+  }
+
+  onSave(): void {
+    if (this.formIsValid) {
+      this.save.emit();
+    }
   }
 
   onCancel(): void {

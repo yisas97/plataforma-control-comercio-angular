@@ -59,9 +59,21 @@
               <ng-container *ngTemplateOutlet="actionTemplate; context: {$implicit: rowData}"></ng-container>
             </ng-container>
             <ng-template #defaultActions>
-              <p-button icon="pi pi-pencil" severity="info" size="small"
+              <p-button *ngIf="showDetailButton"
+                        icon="{{detailIcon}}"
+                        severity="info"
+                        size="small"
+                        pTooltip="{{detailTooltip}}"
+                        (click)="onDetailClick(rowData)"></p-button>
+              <p-button icon="pi pi-pencil"
+                        severity="help"
+                        size="small"
+                        pTooltip="Editar"
                         (click)="onEdit(rowData)"></p-button>
-              <p-button icon="pi pi-trash" severity="danger" size="small"
+              <p-button icon="pi pi-trash"
+                        severity="danger"
+                        size="small"
+                        pTooltip="Eliminar"
                         (click)="onDeleteClick(rowData)"></p-button>
             </ng-template>
           </div>

@@ -1,32 +1,32 @@
 <p-dialog
   [(visible)]="visible"
   [header]="header"
+  [style]="{width: width}"
   [modal]="true"
-  [style]="{width: '500px'}"
   [draggable]="false"
   [resizable]="false"
-  [closable]="false"
-  styleClass="form-dialog">
+  (onHide)="onHide()"
+  styleClass="form-modal"
+  [closeOnEscape]="true"
+  [dismissableMask]="true">
 
-  <div class="form-container p-fluid">
-    <ng-container *ngIf="formTemplate && item">
-      <ng-container *ngTemplateOutlet="formTemplate; context: {$implicit: item}"></ng-container>
-    </ng-container>
-  </div>
+  <ng-container *ngIf="formTemplate && item">
+    <ng-container *ngTemplateOutlet="formTemplate; context: {$implicit: item}"></ng-container>
+  </ng-container>
 
   <ng-template pTemplate="footer">
     <div class="flex justify-content-end gap-2">
       <p-button
-        label="Cancelar"
-        icon="pi pi-times"
-        styleClass="p-button-outlined p-button-secondary"
-        (click)="onCancel()">
+        [label]="cancelLabel"
+        [icon]="cancelIcon"
+        (onClick)="onCancel()"
+        styleClass="p-button-text">
       </p-button>
       <p-button
-        label="Guardar"
-        icon="pi pi-check"
-        [disabled]="!formIsValid"
-        (click)="onSave()">
+        [label]="saveLabel"
+        [icon]="saveIcon"
+        (onClick)="onSave()"
+        [disabled]="!formIsValid">
       </p-button>
     </div>
   </ng-template>

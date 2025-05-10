@@ -17,7 +17,7 @@ export class CategoryService {
   constructor() { }
 
   getCategories(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/api/categories`);
+    return this.http.get(`${this.apiUrl}/categories`);
   }
 
 

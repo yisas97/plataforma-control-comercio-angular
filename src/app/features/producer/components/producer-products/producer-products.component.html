@@ -1,1 +1,137 @@
-<p>producer-products works!</p>
+<div class="producer-products">
+  <p-toast></p-toast>
+
+  <ng-template #productFormTemplate let-product>
+    <form [formGroup]="productForm" class="p-fluid">
+      <div class="grid">
+        <div class="col-12 mb-3">
+          <label for="name" class="block text-sm font-medium mb-1">Nombre *</label>
+          <input
+            id="name"
+            type="text"
+            pInputText
+            formControlName="name"
+            placeholder="Nombre del producto"
+            class="w-full"
+          />
+          <small
+            *ngIf="productForm.get('name')?.invalid && productForm.get('name')?.touched"
+            class="p-error block mt-1"
+          >
+            El nombre es obligatorio y debe tener máximo 100 caracteres
+          </small>
+        </div>
+
+        <div class="col-12 mb-3">
+          <label for="categoryIds" class="block text-sm font-medium mb-1">Categoría *</label>
+          <p-dropdown
+            id="categoryIds"
+            formControlName="categoryIds"
+            [options]="categories"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="Seleccione una categoría"
+            class="w-full"
+          ></p-dropdown>
+          <small
+            *ngIf="productForm.get('categoryIds')?.invalid && productForm.get('categoryIds')?.touched"
+            class="p-error block mt-1"
+          >
+            La categoría es obligatoria
+          </small>
+        </div>
+
+        <div class="col-12 mb-3">
+          <label for="description" class="block text-sm font-medium mb-1">Descripción</label>
+          <textarea
+            id="description"
+            pTextarea
+            formControlName="description"
+            rows="3"
+            placeholder="Descripción del producto"
+            class="w-full"
+          ></textarea>
+          <small
+            *ngIf="productForm.get('description')?.invalid && productForm.get('description')?.touched"
+            class="p-error block mt-1"
+          >
+            La descripción debe tener máximo 500 caracteres
+          </small>
+        </div>
+
+        <div class="col-6 mb-3">
+          <label for="price" class="block text-sm font-medium mb-1">Precio *</label>
+          <p-inputNumber
+            id="price"
+            formControlName="price"
+            mode="currency"
+            currency="PEN"
+            locale="es-PE"
+            [min]="0"
+            class="w-full"
+          ></p-inputNumber>
+          <small
+            *ngIf="productForm.get('price')?.invalid && productForm.get('price')?.touched"
+            class="p-error block mt-1"
+          >
+            El precio es obligatorio y debe ser mayor o igual a 0
+          </small>
+        </div>
+
+        <div class="col-6 mb-3">
+          <label for="quantity" class="block text-sm font-medium mb-1">Stock *</label>
+          <p-inputNumber
+            id="quantity"
+            formControlName="quantity"
+            [min]="0"
+            [showButtons]="true"
+            class="w-full"
+          ></p-inputNumber>
+          <small
+            *ngIf="productForm.get('quantity')?.invalid && productForm.get('quantity')?.touched"
+            class="p-error block mt-1"
+          >
+            El stock es obligatorio y debe ser mayor o igual a 0
+          </small>
+        </div>
+
+        <div class="col-12 mb-3">
+          <label for="sku" class="block text-sm font-medium mb-1">SKU</label>
+          <input
+            id="sku"
+            type="text"
+            pInputText
+            formControlName="sku"
+            placeholder="Código SKU"
+            class="w-full"
+          />
+        </div>
+      </div>
+    </form>
+  </ng-template>
+
+
+  <app-template-mantenimiento
+    [title]="'Mis Productos'"
+    [items]="products"
+    [cols]="cols"
+    [loading]="loading"
+    [globalFilterFields]="globalFilterFields"
+    [form]="productForm"
+    [formTemplate]="productFormTemplate"
+    [(showFormModal)]="showFormModal"
+    [(showDeleteModal)]="showDeleteModal"
+    [(selectedItem)]="selectedProduct"
+    [showDetailButton]="true"
+    [detailTooltip]="'Ver detalles'"
+    [detailIcon]="'pi pi-eye'"
+    [detailSeverity]="'info'"
+    (add)="onAdd()"
+    (edit)="onEdit($event)"
+    (delete)="onDeleteConfirm()"
+    (detail)="navigateToEdit($event)"
+    (save)="onSave()"
+    (cancel)="productForm.reset()"
+    >
+  </app-template-mantenimiento>
+</div>

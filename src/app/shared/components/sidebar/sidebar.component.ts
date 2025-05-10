@@ -28,7 +28,7 @@ export class SidebarComponent {
 
   loadSidebarMenu() {
     // Cargar menú según el rol
-    switch(this.userRole) {
+    switch (this.userRole) {
       case PERFILES.ADMIN:
         this.loadAdminMenu();
         break;
@@ -49,15 +49,15 @@ export class SidebarComponent {
       {
         title: 'Administración',
         items: [
-          { label: 'Dashboard', icon: 'dashboard', route: '/admin/dashboard' },
-          { label: 'Estadísticas', icon: 'bar_chart', route: '/admin/statistics' }
+          {label: 'Dashboard', icon: 'dashboard', route: '/admin/dashboard'},
+          {label: 'Estadísticas', icon: 'bar_chart', route: '/admin/statistics'}
         ]
       },
       {
         title: 'Usuarios',
         items: [
-          { label: 'Gestión de Usuarios', icon: 'people', route: '/admin/users' },
-          { label: 'Productores Pendientes', icon: 'pending', route: '/admin/producers/pending' }
+          {label: 'Gestión de Usuarios', icon: 'people', route: '/admin/users'},
+          {label: 'Productores Pendientes', icon: 'pending', route: '/admin/producers/pending'}
         ]
       },
       {
@@ -74,7 +74,40 @@ export class SidebarComponent {
   }
 
   loadProducerMenu() {
-    // Similar al admin pero con opciones de productor
+    this.sidebarGroups = [
+      {
+        title: 'Administración',
+        items: [
+          {label: 'Dashboard', icon: 'dashboard', route: '/producer/dashboard'},
+        ]
+      },
+      {
+        title: 'Mi Perfil de Tienda',
+        items: [
+          {label: 'Información Basica', icon: 'bar_chart', route: '/producer/profile/info'},
+          {label: 'Galeria', icon: 'bar_chart', route: '/producer/profile/gallery'}
+        ]
+      },
+      {
+        title: 'Productos',
+        items: [
+          {
+            label: 'Mis Productos',
+            icon: 'inventory',
+            route: '/producer/products'
+          },
+          {
+            label: 'Añadir/Editar Productos',
+            icon: 'add_circle',
+            route: '/producer/products/edit/:id'},
+          {
+            label: 'Gestión de Inventario',
+            icon: 'add_circle',
+            route: '/producer/inventory'
+          }
+        ]
+      }
+    ];
   }
 
   loadClientMenu() {

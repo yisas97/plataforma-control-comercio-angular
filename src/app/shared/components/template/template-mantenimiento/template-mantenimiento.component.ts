@@ -7,6 +7,7 @@ import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {CheckboxModule} from 'primeng/checkbox';
 import {ConfirmationModalComponent, FormModalComponent} from '../../modal';
+import {Tooltip} from 'primeng/tooltip';
 
 export interface ColumnDefinition {
   field: string;
@@ -35,6 +36,7 @@ export interface ColumnDefinition {
     CheckboxModule,
     FormModalComponent,
     ConfirmationModalComponent,
+    Tooltip,
   ],
   templateUrl: './template-mantenimiento.component.html',
   standalone: true,
@@ -53,19 +55,30 @@ export class TemplateMantenimientoComponent<T extends { id?: number }> implement
   @Input() form: FormGroup | null = null;
   @Input() rowsPerPage: number = 10;
 
+  @Input() showDetailButton = true;
+  @Input() detailIcon = 'pi pi-eye';
+  @Input() detailTooltip = 'Ver detalles';
+  @Input() detailSeverity = 'info';
+  @Output() detail = new EventEmitter<T>();
+
+  @Input() showFormModal: boolean = false;
+  @Input() showDeleteModal: boolean = false;
+  @Input() selectedItem: T | null = null;
+
+  @Output() showFormModalChange = new EventEmitter<boolean>();
+  @Output() showDeleteModalChange = new EventEmitter<boolean>();
+  @Output() selectedItemChange = new EventEmitter<T>();
+
   @Output() add = new EventEmitter<void>();
   @Output() edit = new EventEmitter<T>();
   @Output() delete = new EventEmitter<T>();
   @Output() save = new EventEmitter<T>();
   @Output() cancel = new EventEmitter<void>();
   @Output() formInit = new EventEmitter<T>();
-
-  selectedItem: T | null = null;
-  showFormModal: boolean = false;
-  showDeleteModal: boolean = false;
   itemToDelete: T | null = null;
 
-  globalFilterFields: string[] = [];
+
+  @Input() globalFilterFields: string[] = [];
   formIsValid: boolean = false;
 
   ngOnInit() {
@@ -95,14 +108,18 @@ export class TemplateMantenimientoComponent<T extends { id?: number }> implement
 
   onAdd(): void {
     this.selectedItem = {} as T;
+    this.selectedItemChange.emit(this.selectedItem);
     this.showFormModal = true;
+    this.showFormModalChange.emit(true);
     this.add.emit();
     this.formInit.emit(this.selectedItem);
   }
 
   onEdit(item: T): void {
     this.selectedItem = {...item as object} as T;
+    this.selectedItemChange.emit(this.selectedItem);
     this.showFormModal = true;
+    this.showFormModalChange.emit(true);
     this.edit.emit(item);
     this.formInit.emit(this.selectedItem);
   }
@@ -110,6 +127,7 @@ export class TemplateMantenimientoComponent<T extends { id?: number }> implement
   onDeleteClick(item: T): void {
     this.itemToDelete = item;
     this.showDeleteModal = true;
+    this.showDeleteModalChange.emit(true);
   }
 
   onDeleteConfirm(): void {
@@ -117,6 +135,7 @@ export class TemplateMantenimientoComponent<T extends { id?: number }> implement
       this.delete.emit(this.itemToDelete);
     }
     this.showDeleteModal = false;
+    this.showDeleteModalChange.emit(false);
   }
 
   onSave(): void {
@@ -126,12 +145,15 @@ export class TemplateMantenimientoComponent<T extends { id?: number }> implement
       const updatedItem = { ...this.selectedItem, ...formValues };
       this.save.emit(updatedItem);
       this.showFormModal = false;
+      this.showFormModalChange.emit(false);
     }
   }
 
   onCancel(): void {
     this.cancel.emit();
     this.form?.reset();
+    this.showFormModal = false;
+    this.showFormModalChange.emit(false);
   }
 
   getFormHeader(): string {
@@ -198,5 +220,9 @@ export class TemplateMantenimientoComponent<T extends { id?: number }> implement
     }
 
     return classes;
+  }
+
+  onDetailClick(item: T): void {
+    this.detail.emit(item);
   }
 }
