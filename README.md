@@ -57,3 +57,25 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+
+
+**
+* Tabla de equivalencias entre funciones de color obsoletas y modernas:
+*
+* | Función obsoleta             | Equivalente moderno                                    |
+* |------------------------------|--------------------------------------------------------|
+* | darken($color, 10%)          | color.scale($color, $lightness: -10%)                  |
+* | lighten($color, 10%)         | color.scale($color, $lightness: 10%)                   |
+* | saturate($color, 10%)        | color.scale($color, $saturation: 10%)                  |
+* | desaturate($color, 10%)      | color.scale($color, $saturation: -10%)                 |
+* | mix($color1, $color2, 50%)   | color.mix($color1, $color2, 50%)                       |
+* | adjust-hue($color, 180deg)   | color.adjust($color, $hue: 180deg)                     |
+* | transparentize($color, 0.5)  | color.adjust($color, $alpha: -0.5)                     |
+* | rgba($color, 0.5)            | color.adjust($color, $alpha: 0.5)                      |
+* | fade-in($color, 0.5)         | color.adjust($color, $alpha: 0.5)                      |
+* | fade-out($color, 0.5)        | color.adjust($color, $alpha: -0.5)                     |
+* | complement($color)           | color.scale($color, $hue: 180deg)                      |
+* | grayscale($color)            | color.scale($color, $saturation: -100%)                |
+  */
+

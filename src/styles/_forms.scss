@@ -1,0 +1,50 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.form-container {
+  margin-bottom: $spacing-lg;
+
+  .field {
+    margin-bottom: $spacing-lg;
+
+    label {
+      display: block;
+      margin-bottom: $spacing-xs;
+      font-weight: 500;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: $spacing-sm $spacing-md;
+      border: 1px solid $input-border;
+      border-radius: $border-radius;
+      transition: border-color $transition-quick, box-shadow $transition-quick;
+
+      &:focus {
+        @include focus-ring;
+        border-color: $primary-color;
+      }
+
+      &.ng-invalid.ng-touched {
+        border-color: $danger-color;
+      }
+    }
+
+    small.error-message {
+      display: block;
+      margin-top: $spacing-xs;
+      color: $danger-color;
+      font-size: 0.875rem;
+    }
+  }
+
+  .field-checkbox {
+    display: flex;
+    align-items: center;
+
+    label {
+      margin-left: $spacing-sm;
+      margin-bottom: 0;
+    }
+  }
+}

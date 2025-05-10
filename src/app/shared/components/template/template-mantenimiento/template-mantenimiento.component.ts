@@ -3,7 +3,7 @@ import {DialogModule} from 'primeng/dialog';
 import {Table, TableModule} from 'primeng/table';
 import {ButtonModule} from 'primeng/button';
 import {CommonModule} from '@angular/common';
-import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {CheckboxModule} from 'primeng/checkbox';
 import {ConfirmationModalComponent, FormModalComponent} from '../../modal';
@@ -33,7 +33,8 @@ export interface ColumnDefinition {
     DialogModule,
     InputTextModule,
     CheckboxModule,
-    FormModalComponent
+    FormModalComponent,
+    ConfirmationModalComponent,
   ],
   templateUrl: './template-mantenimiento.component.html',
   standalone: true,
@@ -50,6 +51,7 @@ export class TemplateMantenimientoComponent<T extends { id?: number }> {
   @Input() formTemplate: TemplateRef<any> | null = null;
   @Input() tableClass: string = 'p-datatable-gridlines p-datatable-sm';
   @Input() form: FormGroup | null = null;
+  @Input() rowsPerPage: number = 10;
 
   @Output() add = new EventEmitter<void>();
   @Output() edit = new EventEmitter<T>();
@@ -183,5 +185,4 @@ export class TemplateMantenimientoComponent<T extends { id?: number }> {
 
     return classes;
   }
-
 }

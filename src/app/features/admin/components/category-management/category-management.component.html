@@ -16,13 +16,17 @@
   <form [formGroup]="categoryForm" class="p-fluid">
     <div class="field">
       <label for="name" class="font-medium">Nombre</label>
-      <input
-        id="name"
-        type="text"
-        pInputText
-        formControlName="name"
-        class="w-full"
-        placeholder="Ingrese el nombre de la categoría">
+      <div class="p-inputgroup">
+        <span class="p-inputgroup-addon">
+          <i class="pi pi-tag"></i>
+        </span>
+        <input
+          id="name"
+          type="text"
+          pInputText
+          formControlName="name"
+          placeholder="Ingrese el nombre de la categoría">
+      </div>
       <small
         *ngIf="categoryForm.get('name')?.invalid && (categoryForm.get('name')?.dirty || categoryForm.get('name')?.touched)"
         class="p-error">
@@ -31,16 +35,21 @@
       </small>
     </div>
 
-    <div class="field mt-4">
+    <div class="field">
       <label for="description" class="font-medium">Descripción</label>
-      <textarea
-        id="description"
-        pInputTextarea
-        formControlName="description"
-        class="w-full"
-        rows="3"
-        placeholder="Ingrese una descripción">
-      </textarea>
+      <div class="p-inputgroup">
+        <span class="p-inputgroup-addon">
+          <i class="pi pi-align-left"></i>
+        </span>
+        <textarea
+          id="description"
+          pInputTextarea
+          formControlName="description"
+          rows="3"
+          placeholder="Ingrese una descripción"
+          autoResize="true">
+        </textarea>
+      </div>
       <small
         *ngIf="categoryForm.get('description')?.invalid && (categoryForm.get('description')?.dirty || categoryForm.get('description')?.touched)"
         class="p-error">
@@ -48,13 +57,13 @@
       </small>
     </div>
 
-    <div class="field-checkbox mt-4">
+    <div class="field-checkbox">
       <p-checkbox
         formControlName="active"
         [binary]="true"
         inputId="active">
       </p-checkbox>
-      <label for="active" class="ml-2">Activo</label>
+      <label for="active" class="ml-2 cursor-pointer">Activo</label>
     </div>
   </form>
 </ng-template>

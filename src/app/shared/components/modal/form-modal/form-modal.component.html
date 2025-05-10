@@ -6,9 +6,9 @@
   [draggable]="false"
   [resizable]="false"
   [closable]="false"
-  styleClass="p-fluid">
+  styleClass="form-dialog">
 
-  <div class="p-fluid">
+  <div class="form-container p-fluid">
     <ng-container *ngIf="formTemplate && item">
       <ng-container *ngTemplateOutlet="formTemplate; context: {$implicit: item}"></ng-container>
     </ng-container>

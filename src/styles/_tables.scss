@@ -1,0 +1,27 @@
+// IMPORTANTE: Cada archivo debe hacer su propio @use de variables y mixins
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.data-table-container {
+  margin-bottom: $spacing-lg;
+
+  .table-header {
+    @include flex-between;
+    margin-bottom: $spacing-md;
+  }
+
+  .table-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .table-actions {
+    display: flex;
+    gap: $spacing-sm;
+  }
+
+  .table-search {
+    margin-bottom: $spacing-md;
+  }
+}

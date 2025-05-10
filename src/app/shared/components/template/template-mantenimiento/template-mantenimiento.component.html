@@ -1,9 +1,20 @@
 <div class="surface-card p-4 shadow-2 border-round">
-  <div class="flex w-full items-center mb-3">
+  <div class="flex justify-content-between align-items-center mb-3">
     <h1 class="text-gray-900 text-2xl font-medium m-0">{{title}}</h1>
-    <div class="flex-1"></div>
     <p-button label="Nuevo" icon="pi pi-plus" (click)="onAdd()"
               styleClass="p-button-success"></p-button>
+  </div>
+
+  <div class="mb-3">
+    <span class="p-input-icon-left w-full md:w-auto">
+      <i class="pi pi-search"></i>
+      <input
+        pInputText
+        type="text"
+        placeholder="Buscar..."
+        class="w-full md:w-20rem"
+        (input)="onGlobalFilter($event)" />
+    </span>
   </div>
 
   <p-table
@@ -11,30 +22,22 @@
     [value]="items"
     [loading]="loading"
     [paginator]="true"
-    [rows]="10"
+    [rows]="rowsPerPage"
     [rowsPerPageOptions]="[5,10,25,50]"
     [globalFilterFields]="globalFilterFields"
     [styleClass]="tableClass"
-    responsiveLayout="scroll">
-
-    <ng-template pTemplate="caption">
-      <div class="flex justify-content-between align-items-center">
-        <div>
-          <span class="p-input-icon-left">
-            <i class="pi pi-search"></i>
-            <input pInputText type="text" placeholder="Buscar..."
-                   (input)="onGlobalFilter($event)" />
-          </span>
-        </div>
-      </div>
-    </ng-template>
+    responsiveLayout="scroll"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+    [showCurrentPageReport]="true"
+    [tableStyle]="{'min-width': '100%'}"
+    styleClass="p-datatable-sm p-datatable-gridlines">
 
     <ng-template pTemplate="header">
       <tr>
         <th *ngFor="let col of cols" [ngClass]="{'text-right': col.type === 'number' || col.type === 'decimal' || col.type === 'currency'}">
           {{col.header}}
         </th>
-        <th style="width:120px">Acciones</th>
+        <th style="width:120px" class="text-center">Acciones</th>
       </tr>
     </ng-template>
 
@@ -49,7 +52,7 @@
           </span>
         </td>
         <td>
-          <div class="flex gap-2">
+          <div class="flex justify-content-center gap-2">
             <ng-container *ngIf="actionTemplate; else defaultActions">
               <ng-container *ngTemplateOutlet="actionTemplate; context: {$implicit: rowData}"></ng-container>
             </ng-container>
@@ -67,9 +70,18 @@
     <ng-template pTemplate="emptymessage">
       <tr>
         <td [attr.colspan]="cols.length + 1" class="text-center p-4">
-          No se encontraron registros.
+          <div class="flex flex-column align-items-center">
+            <i class="pi pi-info-circle text-4xl text-blue-300 mb-2"></i>
+            <span>No se encontraron registros.</span>
+          </div>
         </td>
       </tr>
+    </ng-template>
+
+    <ng-template pTemplate="paginatorleft">
+      <div class="text-sm text-secondary">
+        Total: {{items.length}} registros
+      </div>
     </ng-template>
   </p-table>
 
@@ -83,3 +95,16 @@
     (save)="onSave()"
     (cancel)="onCancel()">
   </app-form-modal>
+
+  <!-- Confirmation Modal Component -->
+  <app-confirmation-modal
+    [visible]="showDeleteModal"
+    header="Confirmar Eliminación"
+    message="¿Está seguro que desea eliminar este registro? Esta acción no se puede deshacer."
+    confirmLabel="Eliminar"
+    confirmIcon="pi pi-trash"
+    confirmClass="p-button-danger"
+    (confirm)="onDeleteConfirm()"
+    (cancel)="showDeleteModal = false">
+  </app-confirmation-modal>
+</div>
