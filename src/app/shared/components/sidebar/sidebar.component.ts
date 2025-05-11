@@ -111,7 +111,47 @@ export class SidebarComponent {
   }
 
   loadClientMenu() {
-    // Similar pero con opciones de cliente
+    this.sidebarGroups = [
+      {
+        title: 'MARKETPLACE',
+        items: [
+          {label: 'Inicio', icon: 'home', route: '/marketplace'},
+          {label: 'Catálogo de Productos', icon: 'category', route: '/products'},
+          {label: 'Tiendas/Productores', icon: 'store', route: '/producers'}
+        ]
+      },
+      {
+        title: 'MI CUENTA',
+        items: [
+          {label: 'Dashboard', icon: 'dashboard', route: '/client/dashboard'},
+          {label: 'Mi Perfil', icon: 'person', route: '/client/profile'},
+          {label: 'Mis Direcciones', icon: 'location_on', route: '/client/addresses'},
+          {label: 'Métodos de Pago', icon: 'payment', route: '/client/payment-methods'},
+          {label: 'Notificaciones', icon: 'notifications', route: '/client/notifications'}
+        ]
+      },
+      {
+        title: 'COMPRAS',
+        items: [
+          {label: 'Carrito de Compra', icon: 'shopping_cart', route: '/client/cart'},
+          {label: 'Mis Pedidos', icon: 'receipt', route: '/client/orders'},
+          {label: 'Historial de Compras', icon: 'history', route: '/client/purchase-history'}
+        ]
+      },
+      {
+        title: 'FAVORITOS',
+        items: [
+          {label: 'Mis Favoritos', icon: 'favorite', route: '/client/favorites'},
+          {label: 'Mis Valoraciones', icon: 'star', route: '/client/reviews'}
+        ]
+      },
+      {
+        title: 'COMUNICACIONES',
+        items: [
+          {label: 'Mensajes con Vendedores', icon: 'message', route: '/client/messages'}
+        ]
+      }
+    ];
   }
 
   loadGuestMenu() {

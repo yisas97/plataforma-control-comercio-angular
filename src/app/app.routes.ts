@@ -19,7 +19,7 @@ export const routes: Routes = [
         canActivate: [authGuard]
       },
       {
-        path: 'productos',
+        path: 'products',
         loadChildren: () => import('./features/products/product-routes').then(r => r.PRODUCT_ROUTES),
         canActivate: [authGuard]
       },
@@ -58,6 +58,11 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     loadChildren: () => import('./features/producer/producer-routes').then(r => r.PRODUCER_ROUTES),
     canActivate: [authGuard, producerGuard]
+  },
+  {
+    path: 'marketplace',
+    component: MainLayoutComponent,
+    loadChildren: () => import('./features/marketplace/marketplace-routes').then(r => r.MARKETPLACE_ROUTE),
   },
   {
     path: 'error/:code',
