@@ -48,7 +48,6 @@ export class ErrorHandlerService {
   }
 
   handleBusinessError(errorCode: string): void {
-    // Aquí puedes manejar errores específicos del backend
     console.warn('Error de negocio:', errorCode);
   }
 }

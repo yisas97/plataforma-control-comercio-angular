@@ -1,219 +1,162 @@
-<div class="checkout-container">
-  <h1 class="text-3xl font-bold mb-8">Finalizar Compra</h1>
+<div class="checkout-container p-4">
+  <h1 class="text-3xl font-bold mb-6">Finalizar Compra</h1>
 
-  <div *ngIf="isLoading()" class="flex justify-center py-16">
-    <div class="spinner-border text-primary" role="status">
-      <span class="sr-only">Cargando...</span>
-    </div>
-  </div>
+  <div class="grid grid-cols-12 gap-6">
+    <!-- Formulario de checkout -->
+    <div class="col-span-12 lg:col-span-8">
+      <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
 
-  <ng-container *ngIf="!isLoading() && cart()">
-    <div class="checkout-content grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <div class="checkout-forms col-span-2">
-        <form [formGroup]="shippingForm" (ngSubmit)="onSubmit()">
-          <div class="shipping-form bg-white p-6 rounded-lg shadow-md mb-6">
-            <h2 class="text-xl font-bold mb-4">Dirección de Envío</h2>
+        <!-- Información de envío -->
+        <p-card class="mb-6">
+          <ng-template pTemplate="header">
+            <h2 class="text-xl font-semibold p-4">Información de Envío</h2>
+          </ng-template>
 
-            <div class="form-grid grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="form-group">
-                <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
-                <input
-                  type="text"
-                  id="fullName"
-                  formControlName="fullName"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                />
-                <div *ngIf="shippingForm.get('fullName')?.invalid && shippingForm.get('fullName')?.touched" class="text-red-500 text-sm mt-1">
-                  Nombre completo es requerido
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-                <input
-                  type="tel"
-                  id="phone"
-                  formControlName="phone"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                />
-                <div *ngIf="shippingForm.get('phone')?.invalid && shippingForm.get('phone')?.touched" class="text-red-500 text-sm mt-1">
-                  Teléfono es requerido
-                </div>
-              </div>
-
-              <div class="form-group md:col-span-2">
-                <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
-                <input
-                  type="text"
-                  id="address"
-                  formControlName="address"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                />
-                <div *ngIf="shippingForm.get('address')?.invalid && shippingForm.get('address')?.touched" class="text-red-500 text-sm mt-1">
-                  Dirección es requerida
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="city" class="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
-                <input
-                  type="text"
-                  id="city"
-                  formControlName="city"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                />
-                <div *ngIf="shippingForm.get('city')?.invalid && shippingForm.get('city')?.touched" class="text-red-500 text-sm mt-1">
-                  Ciudad es requerida
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="zipCode" class="block text-sm font-medium text-gray-700 mb-1">Código Postal</label>
-                <input
-                  type="text"
-                  id="zipCode"
-                  formControlName="zipCode"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                />
-                <div *ngIf="shippingForm.get('zipCode')?.invalid && shippingForm.get('zipCode')?.touched" class="text-red-500 text-sm mt-1">
-                  Código postal es requerido
-                </div>
-              </div>
+          <div class="space-y-4">
+            <div>
+              <label for="shippingAddress" class="block text-sm font-medium mb-2">
+                Dirección de Envío *
+              </label>
+              <textarea
+                id="shippingAddress"
+                pInputTextarea
+                formControlName="shippingAddress"
+                placeholder="Ingresa tu dirección completa de envío"
+                rows="3"
+                class="w-full"
+                [class.p-invalid]="checkoutForm.get('shippingAddress')?.invalid && checkoutForm.get('shippingAddress')?.touched">
+              </textarea>
+              @if (getFieldError('shippingAddress')) {
+                <small class="p-error">{{ getFieldError('shippingAddress') }}</small>
+              }
             </div>
           </div>
+        </p-card>
 
-          <div [formGroup]="paymentForm" class="payment-form bg-white p-6 rounded-lg shadow-md mb-6">
-            <h2 class="text-xl font-bold mb-4">Información de Pago</h2>
+        <!-- Método de pago -->
+        <p-card class="mb-6">
+          <ng-template pTemplate="header">
+            <h2 class="text-xl font-semibold p-4">Método de Pago</h2>
+          </ng-template>
 
-            <div class="payment-methods mb-6">
-              <div class="payment-method-header text-sm font-medium text-gray-700 mb-2">
-                Método de pago
-              </div>
-
-              <div class="payment-options flex flex-col space-y-3">
-                <label
-                  *ngFor="let method of paymentMethods()"
-                  class="payment-option flex items-center p-3 border border-gray-300 rounded-md cursor-pointer hover:border-green-500"
-                >
-                  <input
-                    type="radio"
-                    [value]="method.id"
-                    formControlName="paymentMethod"
-                    (change)="onPaymentMethodChange(method.id)"
-                    class="mr-3"
-                  />
-                  <span>{{ method.name }}</span>
+          <div class="space-y-4">
+            @for (method of paymentMethods; track method.value) {
+              <div class="flex items-center">
+                <p-radioButton
+                  [inputId]="method.value"
+                  [value]="method.value"
+                  formControlName="paymentMethod">
+                </p-radioButton>
+                <label [for]="method.value" class="ml-2 cursor-pointer">
+                  {{ method.label }}
                 </label>
               </div>
-            </div>
-
-            <div *ngIf="paymentForm.get('paymentMethod')?.value === 'credit_card'" class="credit-card-form">
-              <div class="form-group mb-4">
-                <label for="cardNumber" class="block text-sm font-medium text-gray-700 mb-1">Número de tarjeta</label>
-                <input
-                  type="text"
-                  id="cardNumber"
-                  formControlName="cardNumber"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  placeholder="1234 5678 9012 3456"
-                />
-                <div *ngIf="paymentForm.get('cardNumber')?.invalid && paymentForm.get('cardNumber')?.touched" class="text-red-500 text-sm mt-1">
-                  Número de tarjeta es requerido
-                </div>
-              </div>
-
-              <div class="form-row grid grid-cols-2 gap-4">
-                <div class="form-group">
-                  <label for="expiryDate" class="block text-sm font-medium text-gray-700 mb-1">Fecha de vencimiento</label>
-                  <input
-                    type="text"
-                    id="expiryDate"
-                    formControlName="expiryDate"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                    placeholder="MM/AA"
-                  />
-                  <div *ngIf="paymentForm.get('expiryDate')?.invalid && paymentForm.get('expiryDate')?.touched" class="text-red-500 text-sm mt-1">
-                    Fecha de vencimiento es requerida
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="cvv" class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
-                  <input
-                    type="text"
-                    id="cvv"
-                    formControlName="cvv"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                    placeholder="123"
-                  />
-                  <div *ngIf="paymentForm.get('cvv')?.invalid && paymentForm.get('cvv')?.touched" class="text-red-500 text-sm mt-1">
-                    CVV es requerido
-                  </div>
-                </div>
-              </div>
-            </div>
+            }
+            @if (getFieldError('paymentMethod')) {
+              <small class="p-error">{{ getFieldError('paymentMethod') }}</small>
+            }
           </div>
+        </p-card>
 
-          <div class="checkout-submit mt-8">
-            <button
-              type="submit"
-              class="w-full bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors"
-              [disabled]="shippingForm.invalid || paymentForm.invalid"
-            >
-              Confirmar Pedido
-            </button>
+        <!-- Notas adicionales -->
+        <p-card class="mb-6">
+          <ng-template pTemplate="header">
+            <h2 class="text-xl font-semibold p-4">Notas Adicionales</h2>
+          </ng-template>
+
+          <div>
+            <label for="notes" class="block text-sm font-medium mb-2">
+              Comentarios o instrucciones especiales (opcional)
+            </label>
+            <textarea
+              id="notes"
+              pInputTextarea
+              formControlName="notes"
+              placeholder="Ej: Entregar en horario de mañana, tocar timbre 2 veces..."
+              rows="3"
+              class="w-full">
+            </textarea>
           </div>
-        </form>
-      </div>
+        </p-card>
 
-      <div class="checkout-summary">
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h2 class="text-xl font-bold mb-4">Resumen del Pedido</h2>
+      </form>
+    </div>
 
-          <div class="order-items space-y-4 mb-6">
-            <div *ngFor="let item of cart()!.items" class="order-item flex items-center">
-              <div class="item-image w-16 h-16 mr-3">
+    <!-- Resumen del pedido -->
+    <div class="col-span-12 lg:col-span-4">
+      <p-card>
+        <ng-template pTemplate="header">
+          <h2 class="text-xl font-semibold p-4">Resumen del Pedido</h2>
+        </ng-template>
+
+        <!-- Lista de productos -->
+        <div class="space-y-4 mb-6">
+          @for (item of cartItems(); track item.id) {
+            <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <div class="w-12 h-12 bg-gray-200 rounded flex-shrink-0">
                 <img
-                  [src]="item.imageUrl || '/assets/images/placeholder.webp'"
+                  [src]="item.productImage || 'assets/product-placeholder.jpg'"
                   [alt]="item.productName"
-                  class="w-full h-full object-cover rounded"
-                />
+                  class="w-full h-full object-cover rounded">
               </div>
-
-              <div class="item-details flex-grow">
-                <h3 class="font-medium">{{ item.productName }}</h3>
-                <p class="text-sm text-gray-600">Cantidad: {{ item.quantity }}</p>
+              <div class="flex-1">
+                <h4 class="font-medium text-sm">{{ item.productName }}</h4>
+                <p class="text-xs text-gray-600">Cantidad: {{ item.quantity }}</p>
               </div>
-
-              <div class="item-price">
-                ${{ (item.price * item.quantity).toFixed(2) }}
+              <div class="text-right">
+                <p class="font-semibold text-sm">{{ '$' + item.subtotal.toFixed(2) }}</p>
               </div>
             </div>
+          }
+        </div>
+
+        <!-- Totales -->
+        <div class="space-y-3 mb-6">
+          <div class="flex justify-between">
+            <span>Subtotal</span>
+            <span>{{ '$' + cartTotal().toFixed(2) }}</span>
           </div>
 
-          <div class="order-totals space-y-2 pt-4 border-t border-gray-200">
-            <div class="flex justify-between">
-              <span>Subtotal:</span>
-              <span>${{ cart()!.subtotal.toFixed(2) }}</span>
-            </div>
+          <div class="flex justify-between">
+            <span>Envío</span>
+            <span class="text-green-600">Gratis</span>
+          </div>
 
-            <div class="flex justify-between">
-              <span>IVA (16%):</span>
-              <span>${{ cart()!.tax.toFixed(2) }}</span>
-            </div>
+          <div class="flex justify-between">
+            <span>Impuestos</span>
+            <span>{{ '$' + (cartTotal() * 0.18).toFixed(2) }}</span>
+          </div>
 
-            <div class="flex justify-between">
-              <span>Envío:</span>
-              <span>${{ cart()!.shipping.toFixed(2) }}</span>
-            </div>
+          <hr class="border-gray-200">
 
-            <div class="flex justify-between font-bold text-lg pt-2 border-t border-gray-200">
-              <span>Total:</span>
-              <span>${{ cart()!.total.toFixed(2) }}</span>
-            </div>
+          <div class="flex justify-between text-xl font-bold">
+            <span>Total</span>
+            <span>{{ '$' + (cartTotal() * 1.18).toFixed(2) }}</span>
           </div>
         </div>
-      </div>
+
+        <!-- Botones de acción -->
+        <div class="space-y-3">
+          <p-button
+            label="Confirmar Pedido"
+            icon="pi pi-check"
+            class="w-full"
+            [loading]="isProcessing()"
+            [disabled]="checkoutForm.invalid || cartItems().length === 0"
+            (click)="onSubmit()">
+          </p-button>
+
+          <p-button
+            label="Volver al Carrito"
+            icon="pi pi-arrow-left"
+            severity="secondary"
+            [outlined]="true"
+            class="w-full"
+            routerLink="/client/cart"
+            [disabled]="isProcessing()">
+          </p-button>
+        </div>
+      </p-card>
     </div>
-  </ng-container>
+  </div>
 </div>

@@ -1,89 +1,89 @@
-<div class="order-confirmation-container">
-  <div *ngIf="isLoading()" class="flex justify-center py-16">
-    <div class="spinner-border text-primary" role="status">
-      <span class="sr-only">Cargando...</span>
-    </div>
-  </div>
+<!--<div class="order-confirmation-container">-->
+<!--  <div *ngIf="isLoading()" class="flex justify-center py-16">-->
+<!--    <div class="spinner-border text-primary" role="status">-->
+<!--      <span class="sr-only">Cargando...</span>-->
+<!--    </div>-->
+<!--  </div>-->
 
-  <ng-container *ngIf="!isLoading() && order()">
-    <div class="confirmation-content bg-white p-8 rounded-lg shadow-md max-w-3xl mx-auto">
-      <div class="confirmation-header text-center mb-8">
-        <div class="confirmation-icon mx-auto mb-4 w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
-        </div>
+<!--  <ng-container *ngIf="!isLoading() && order()">-->
+<!--    <div class="confirmation-content bg-white p-8 rounded-lg shadow-md max-w-3xl mx-auto">-->
+<!--      <div class="confirmation-header text-center mb-8">-->
+<!--        <div class="confirmation-icon mx-auto mb-4 w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center">-->
+<!--          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">-->
+<!--            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />-->
+<!--          </svg>-->
+<!--        </div>-->
 
-        <h1 class="text-3xl font-bold mb-2">¡Pedido Confirmado!</h1>
-        <p class="text-gray-600">Tu pedido ha sido procesado correctamente.</p>
-      </div>
+<!--        <h1 class="text-3xl font-bold mb-2">¡Pedido Confirmado!</h1>-->
+<!--        <p class="text-gray-600">Tu pedido ha sido procesado correctamente.</p>-->
+<!--      </div>-->
 
-      <div class="order-details border-t border-b border-gray-200 py-6 mb-6">
-        <div class="detail-row flex justify-between mb-3">
-          <span class="font-medium">Número de Pedido:</span>
-          <span>{{ order()!.orderNumber }}</span>
-        </div>
+<!--      <div class="order-details border-t border-b border-gray-200 py-6 mb-6">-->
+<!--        <div class="detail-row flex justify-between mb-3">-->
+<!--          <span class="font-medium">Número de Pedido:</span>-->
+<!--          <span>{{ order()!.orderNumber }}</span>-->
+<!--        </div>-->
 
-        <div class="detail-row flex justify-between mb-3">
-          <span class="font-medium">Fecha:</span>
-          <span>{{ formatDate(order()!.orderDate) }}</span>
-        </div>
+<!--        <div class="detail-row flex justify-between mb-3">-->
+<!--          <span class="font-medium">Fecha:</span>-->
+<!--          <span>{{ formatDate(order()!.orderDate) }}</span>-->
+<!--        </div>-->
 
-        <div class="detail-row flex justify-between mb-3">
-          <span class="font-medium">Estado:</span>
-          <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
-            {{ getStatusText(order()!.status) }}
-          </span>
-        </div>
+<!--        <div class="detail-row flex justify-between mb-3">-->
+<!--          <span class="font-medium">Estado:</span>-->
+<!--          <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">-->
+<!--            {{ getStatusText(order()!.status) }}-->
+<!--          </span>-->
+<!--        </div>-->
 
-        <div class="detail-row flex justify-between mb-3">
-          <span class="font-medium">Dirección de Envío:</span>
-          <span class="text-right">{{ order()!.shippingAddress }}</span>
-        </div>
+<!--        <div class="detail-row flex justify-between mb-3">-->
+<!--          <span class="font-medium">Dirección de Envío:</span>-->
+<!--          <span class="text-right">{{ order()!.shippingAddress }}</span>-->
+<!--        </div>-->
 
-        <div class="detail-row flex justify-between">
-          <span class="font-medium">Método de Pago:</span>
-          <span>{{ order()!.paymentMethod === 'credit_card' ? 'Tarjeta de Crédito/Débito' :
-            order()!.paymentMethod === 'paypal' ? 'PayPal' : 'Pago contra entrega' }}</span>
-        </div>
-      </div>
+<!--        <div class="detail-row flex justify-between">-->
+<!--          <span class="font-medium">Método de Pago:</span>-->
+<!--          <span>{{ order()!.paymentMethod === 'credit_card' ? 'Tarjeta de Crédito/Débito' :-->
+<!--            order()!.paymentMethod === 'paypal' ? 'PayPal' : 'Pago contra entrega' }}</span>-->
+<!--        </div>-->
+<!--      </div>-->
 
-      <div class="order-items mb-6">
-        <h2 class="text-xl font-bold mb-4">Productos</h2>
+<!--      <div class="order-items mb-6">-->
+<!--        <h2 class="text-xl font-bold mb-4">Productos</h2>-->
 
-        <div class="items-list space-y-4">
-          <div *ngFor="let item of order()!.items" class="item-row flex items-center">
-            <div class="item-quantity w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-3">
-              {{ item.quantity }}
-            </div>
+<!--        <div class="items-list space-y-4">-->
+<!--          <div *ngFor="let item of order()!.items" class="item-row flex items-center">-->
+<!--            <div class="item-quantity w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-3">-->
+<!--              {{ item.quantity }}-->
+<!--            </div>-->
 
-            <div class="item-details flex-grow">
-              <h3 class="font-medium">{{ item.productName }}</h3>
-              <p class="text-sm text-gray-600">Vendido por: {{ item.producerName }}</p>
-            </div>
+<!--            <div class="item-details flex-grow">-->
+<!--              <h3 class="font-medium">{{ item.productName }}</h3>-->
+<!--              <p class="text-sm text-gray-600">Vendido por: {{ item.producerName }}</p>-->
+<!--            </div>-->
 
-            <div class="item-price text-right">
-              <p class="font-medium">${{ item.subtotal.toFixed(2) }}</p>
-              <p class="text-sm text-gray-600">${{ item.unitPrice.toFixed(2) }} cada uno</p>
-            </div>
-          </div>
-        </div>
-      </div>
+<!--            <div class="item-price text-right">-->
+<!--              <p class="font-medium">${{ item.subtotal.toFixed(2) }}</p>-->
+<!--              <p class="text-sm text-gray-600">${{ item.unitPrice.toFixed(2) }} cada uno</p>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
 
-      <div class="order-total flex justify-between items-center pt-4 border-t border-gray-200">
-        <span class="text-lg font-bold">Total:</span>
-        <span class="text-2xl font-bold text-green-700">${{ order()!.total.toFixed(2) }}</span>
-      </div>
+<!--      <div class="order-total flex justify-between items-center pt-4 border-t border-gray-200">-->
+<!--        <span class="text-lg font-bold">Total:</span>-->
+<!--        <span class="text-2xl font-bold text-green-700">${{ order()!.total.toFixed(2) }}</span>-->
+<!--      </div>-->
 
-      <div class="confirmation-actions mt-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-        <a routerLink="/pedidos" class="flex-1 bg-green-600 text-white text-center py-3 px-6 rounded-lg hover:bg-green-700 transition-colors">
-          Ver mis pedidos
-        </a>
+<!--      <div class="confirmation-actions mt-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">-->
+<!--        <a routerLink="/pedidos" class="flex-1 bg-green-600 text-white text-center py-3 px-6 rounded-lg hover:bg-green-700 transition-colors">-->
+<!--          Ver mis pedidos-->
+<!--        </a>-->
 
-        <a routerLink="/productos" class="flex-1 bg-gray-200 text-gray-800 text-center py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors">
-          Seguir comprando
-        </a>
-      </div>
-    </div>
-  </ng-container>
-</div>
+<!--        <a routerLink="/productos" class="flex-1 bg-gray-200 text-gray-800 text-center py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors">-->
+<!--          Seguir comprando-->
+<!--        </a>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </ng-container>-->
+<!--</div>-->

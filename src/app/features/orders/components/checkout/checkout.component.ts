@@ -1,174 +1,122 @@
-import {Component, inject, signal} from '@angular/core';
+import {Component, inject, OnInit, signal} from '@angular/core';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {CommonModule} from '@angular/common';
-import {Cart} from '../../model/cart.model';
 import {OrderService} from '../../services/order.service';
-import {CartService} from '../../services/cart.service';
 import {Router} from '@angular/router';
-import {PaymentMethod} from '../../model/payment.model';
-import {PaymentService} from '../../services/payment.service';
+import {MessageService} from 'primeng/api';
+import {Button} from 'primeng/button';
+import {CartService} from '../../../marketplace/services/cart.service';
+import {RadioButton} from 'primeng/radiobutton';
+import {Card} from 'primeng/card';
 
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, Button, RadioButton, Card],
+  providers: [MessageService],
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.scss'
 })
-export class CheckoutComponent {
+export class CheckoutComponent implements OnInit {
+
   private fb = inject(FormBuilder);
   private cartService = inject(CartService);
   private orderService = inject(OrderService);
-  private paymentService = inject(PaymentService);
+  private messageService = inject(MessageService);
   private router = inject(Router);
 
-  cart = signal<Cart | null>(null);
-  isLoading = signal(false);
-  paymentMethods = signal<PaymentMethod[]>([]);
+  cartItems = this.cartService.cartItems;
+  cartTotal = this.cartService.cartTotal;
 
-  shippingForm!: FormGroup;
-  paymentForm!: FormGroup;
+  checkoutForm: FormGroup;
+  isProcessing = signal(false);
 
-  ngOnInit(): void {
-    this.initForms();
-    this.loadCart();
-    this.loadPaymentMethods();
-  }
+  paymentMethods = [
+    { label: 'Tarjeta de Crédito', value: 'CREDIT_CARD' },
+    { label: 'Tarjeta de Débito', value: 'DEBIT_CARD' },
+    { label: 'PayPal', value: 'PAYPAL' },
+    { label: 'Transferencia Bancaria', value: 'BANK_TRANSFER' },
+    { label: 'Efectivo contra entrega', value: 'CASH_ON_DELIVERY' }
+  ];
 
-  initForms(): void {
-    this.shippingForm = this.fb.group({
-      fullName: ['', [Validators.required]],
-      phone: ['', [Validators.required]],
-      address: ['', [Validators.required]],
-      city: ['', [Validators.required]],
-      zipCode: ['', [Validators.required]]
-    });
-
-    this.paymentForm = this.fb.group({
-      paymentMethod: ['credit_card', [Validators.required]],
-      cardNumber: [''],
-      expiryDate: [''],
-      cvv: ['']
+  constructor() {
+    this.checkoutForm = this.fb.group({
+      shippingAddress: ['', [Validators.required, Validators.minLength(10)]],
+      paymentMethod: ['', Validators.required],
+      notes: ['']
     });
   }
 
-  loadCart(): void {
-    this.isLoading.set(true);
-    this.cartService.getCart().subscribe({
-      next: (data) => {
-        this.cart.set(data);
-        this.isLoading.set(false);
+  ngOnInit() {
+    // Verificar si hay items en el carrito
+    if (this.cartItems().length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Carrito vacío',
+        detail: 'Agrega productos antes de proceder al checkout'
+      });
+      this.router.navigate(['/marketplace']);
+    }
+  }
 
-        // Redirigir si el carrito está vacío
-        if (data.items.length === 0) {
-          this.router.navigate(['/carrito']);
+  onSubmit() {
+    if (this.checkoutForm.valid && this.cartItems().length > 0) {
+      this.isProcessing.set(true);
+
+      const orderData = {
+        shippingAddress: this.checkoutForm.value.shippingAddress,
+        paymentMethod: this.checkoutForm.value.paymentMethod,
+        notes: this.checkoutForm.value.notes,
+        items: this.cartItems().map(item => ({
+          productId: item.productId,
+          quantity: item.quantity
+        }))
+      };
+
+      this.orderService.createOrder(orderData).subscribe({
+        next: (order) => {
+          this.isProcessing.set(false);
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Pedido creado',
+            detail: `Tu pedido #${order.id} ha sido creado exitosamente`
+          });
+
+          // Limpiar carrito y redirigir
+          this.cartService.clearCart().subscribe(() => {
+            this.router.navigate(['/client/orders']);
+          });
+        },
+        error: (error) => {
+          this.isProcessing.set(false);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudo procesar tu pedido. Intenta nuevamente.'
+          });
         }
-      },
-      error: (err) => {
-        console.error('Error cargando carrito', err);
-        this.isLoading.set(false);
-        this.router.navigate(['/carrito']);
-      }
-    });
-  }
-
-  loadPaymentMethods(): void {
-    this.paymentService.getPaymentMethods().subscribe({
-      next: (methods) => {
-        this.paymentMethods.set(methods);
-      },
-      error: (err) => {
-        console.error('Error cargando métodos de pago', err);
-        // Establecer métodos de pago por defecto
-        this.paymentMethods.set([
-          { id: 'credit_card', name: 'Tarjeta de Crédito/Débito' },
-          { id: 'paypal', name: 'PayPal' },
-          { id: 'cash_on_delivery', name: 'Pago contra entrega' }
-        ]);
-      }
-    });
-  }
-
-  onPaymentMethodChange(method: string): void {
-    const cardFields = ['cardNumber', 'expiryDate', 'cvv'];
-
-    if (method === 'credit_card') {
-      cardFields.forEach(field => {
-        this.paymentForm.get(field)?.setValidators(Validators.required);
       });
     } else {
-      cardFields.forEach(field => {
-        this.paymentForm.get(field)?.clearValidators();
-        this.paymentForm.get(field)?.setValue('');
-      });
+      this.markFormGroupTouched();
     }
+  }
 
-    cardFields.forEach(field => {
-      this.paymentForm.get(field)?.updateValueAndValidity();
+  private markFormGroupTouched() {
+    Object.keys(this.checkoutForm.controls).forEach(key => {
+      this.checkoutForm.get(key)?.markAsTouched();
     });
   }
 
-  onSubmit(): void {
-    if (this.shippingForm.invalid || this.paymentForm.invalid) {
-      // Marcar todos los campos como touched para mostrar errores
-      Object.keys(this.shippingForm.controls).forEach(key => {
-        this.shippingForm.get(key)?.markAsTouched();
-      });
-
-      Object.keys(this.paymentForm.controls).forEach(key => {
-        this.paymentForm.get(key)?.markAsTouched();
-      });
-
-      return;
-    }
-
-    this.isLoading.set(true);
-
-    // Crear dirección de envío completa
-    const shippingData = this.shippingForm.value;
-    const shippingAddress = `${shippingData.fullName}, ${shippingData.phone}, ${shippingData.address}, ${shippingData.city}, ${shippingData.zipCode}`;
-
-    // Preparar información de pago
-    const paymentInfo = {
-      paymentMethod: this.paymentForm.get('paymentMethod')?.value,
-      ...(this.paymentForm.get('paymentMethod')?.value === 'credit_card' && {
-        cardNumber: this.paymentForm.get('cardNumber')?.value,
-        expiryDate: this.paymentForm.get('expiryDate')?.value,
-        cvv: this.paymentForm.get('cvv')?.value
-      })
-    };
-
-    // Crear el pedido
-    const orderRequest = {
-      shippingAddress,
-      paymentMethod: paymentInfo.paymentMethod
-    };
-
-    this.orderService.createOrder(orderRequest).subscribe({
-      next: (order) => {
-        // Si el pago es con tarjeta, procesarlo
-        if (paymentInfo.paymentMethod === 'credit_card') {
-          this.paymentService.processPayment(paymentInfo, order.id).subscribe({
-            next: () => {
-              this.isLoading.set(false);
-              this.router.navigate(['/pedidos/confirmation', order.id]);
-            },
-            error: (err) => {
-              console.error('Error procesando pago', err);
-              this.isLoading.set(false);
-              // En un caso real, habría que implementar la lógica adecuada para manejar fallos en el pago
-              this.router.navigate(['/pedidos/confirmation', order.id]);
-            }
-          });
-        } else {
-          this.isLoading.set(false);
-          this.router.navigate(['/pedidos/confirmation', order.id]);
-        }
-      },
-      error: (err) => {
-        console.error('Error creando pedido', err);
-        this.isLoading.set(false);
+  getFieldError(fieldName: string): string {
+    const field = this.checkoutForm.get(fieldName);
+    if (field?.errors && field.touched) {
+      if (field.errors['required']) {
+        return `${fieldName} es obligatorio`;
       }
-    });
+      if (field.errors['minlength']) {
+        return `${fieldName} debe tener al menos ${field.errors['minlength'].requiredLength} caracteres`;
+      }
+    }
+    return '';
   }
 }

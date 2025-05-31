@@ -65,7 +65,6 @@ export class HeaderComponent implements OnInit {
 
   logout() {
     this.authService.logout();
-    // Redirigir a la página de inicio
   }
 
 }

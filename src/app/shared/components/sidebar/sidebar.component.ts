@@ -133,7 +133,7 @@ export class SidebarComponent {
       {
         title: 'COMPRAS',
         items: [
-          {label: 'Carrito de Compra', icon: 'shopping_cart', route: '/client/cart'},
+          {label: 'Carrito de Compra', icon: 'shopping_cart', route: '/marketplace/cart'},
           {label: 'Mis Pedidos', icon: 'receipt', route: '/client/orders'},
           {label: 'Historial de Compras', icon: 'history', route: '/client/purchase-history'}
         ]

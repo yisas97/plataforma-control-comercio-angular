@@ -101,7 +101,6 @@ export class CategoryManagementComponent {
   }
 
   saveCategory(category: Category) {
-    // Aquí combinamos los datos del formulario con el objeto category
     const formValues = this.categoryForm.value;
     const updatedCategory = { ...category, ...formValues };
 

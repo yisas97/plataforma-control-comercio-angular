@@ -6,7 +6,7 @@ import {Order} from '../../model/order.model';
 
 @Component({
   selector: 'app-order-list',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   standalone: true,
   templateUrl: './order-list.component.html',
   styleUrl: './order-list.component.scss'
@@ -23,16 +23,16 @@ export class OrderListComponent implements OnInit {
 
   loadOrders(): void {
     this.isLoading.set(true);
-    this.orderService.getUserOrders().subscribe({
-      next: (data) => {
-        this.orders.set(data);
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        console.error('Error cargando pedidos', err);
-        this.isLoading.set(false);
-      }
-    });
+    // this.orderService.getUserOrders().subscribe({
+    //   next: (data) => {
+    //     this.orders.set(data);
+    //     this.isLoading.set(false);
+    //   },
+    //   error: (err) => {
+    //     console.error('Error cargando pedidos', err);
+    //     this.isLoading.set(false);
+    //   }
+    // });
   }
 
   getStatusText(status: string): string {

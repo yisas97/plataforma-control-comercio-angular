@@ -38,7 +38,6 @@ export class LoginComponent {
       },
       error: (error) => {
         console.error(error);
-        // Implementación de alerta de error (puedes usar SweetAlert2)
         this.isSubmitting = false;
       }
     });

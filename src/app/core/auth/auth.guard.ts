@@ -1,6 +1,6 @@
 import {CanActivateFn, Router} from '@angular/router';
 import {inject} from '@angular/core';
-import {AuthService} from '../services/auth.service';
+import {AuthService} from '../services';
 
 export const authGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
@@ -8,7 +8,6 @@ export const authGuard: CanActivateFn = (route, state) => {
   const token = localStorage.getItem('auth_token');
   console.log("Token en el guard:", token);
   if (token) {
-    // Verificar si el token es válido (no ha expirado)
     if (authService.isTokenValid()) {
       return true;
     }

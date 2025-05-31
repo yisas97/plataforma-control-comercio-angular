@@ -1,24 +1,35 @@
 export interface OrderItem {
+  id: number;
   productId: number;
   productName: string;
-  producerId: number;
-  producerName: string;
+  productImage?: string;
   quantity: number;
-  unitPrice: number;
+  price: number;
   subtotal: number;
 }
 
 export interface Order {
   id: number;
-  orderNumber: string;
-  orderDate: string;
-  status: 'PENDING' | 'PAID' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
   userId: number;
+  userName: string;
+  userEmail: string;
+  totalAmount: number;
+  status: 'PENDING' | 'CONFIRMED' | 'PREPARING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
   shippingAddress: string;
   paymentMethod: string;
-  subtotal: number;
-  tax: number;
-  shippingCost: number;
-  total: number;
-  items: OrderItem[];
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+  orderItems: OrderItem[];
+}
+
+
+export interface CreateOrderRequest {
+  shippingAddress: string;
+  paymentMethod: string;
+  notes?: string;
+  items: Array<{
+    productId: number;
+    quantity: number;
+  }>;
 }

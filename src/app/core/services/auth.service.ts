@@ -38,7 +38,6 @@ export class AuthService {
   private currentUser = signal<any>(null);
 
   constructor() {
-    // Inicializa el estado de autenticación cuando se inicia la app
     this.checkAuthStatus();
   }
 
@@ -49,7 +48,6 @@ export class AuthService {
     const token = localStorage.getItem('auth_token');
     const userStr = localStorage.getItem('auth_user');
 
-    // Verificar si userStr es "undefined" o null o no existe
     if (token && this.isTokenValid() && userStr && userStr !== "undefined") {
       try {
         const user = JSON.parse(userStr);
@@ -60,7 +58,6 @@ export class AuthService {
         this.clearAuthData();
       }
     } else {
-      // Si alguno de los valores no existe o es inválido, limpia todos los datos
       this.clearAuthData();
     }
   }
@@ -175,7 +172,6 @@ export class AuthService {
     const user = this.currentUser();
     if (!user) return false;
 
-    // Ajusta esto según la estructura de tu objeto usuario
     return user.role === `ROLE_${role}`;
   }
 

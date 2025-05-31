@@ -1,0 +1,136 @@
+<div class="cart-container p-4">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">Mi Carrito de Compras</h1>
+    <p-button
+      label="Limpiar Carrito"
+      icon="pi pi-trash"
+      severity="danger"
+      [outlined]="true"
+      (click)="clearCart()"
+      [disabled]="cartItems().length === 0">
+    </p-button>
+  </div>
+
+  <div class="grid grid-cols-12 gap-6">
+    <!-- Lista de productos en el carrito -->
+    <div class="col-span-12 lg:col-span-8">
+      @if (loading) {
+        <div class="text-center p-8">
+          <i class="pi pi-spinner pi-spin text-4xl"></i>
+          <p class="mt-4">Cargando carrito...</p>
+        </div>
+      } @else if (cartItems().length === 0) {
+        <p-card>
+          <div class="text-center p-8">
+            <i class="pi pi-shopping-cart text-6xl text-gray-400 mb-4"></i>
+            <h3 class="text-xl font-semibold mb-2">Tu carrito está vacío</h3>
+            <p class="text-gray-600 mb-4">Agrega algunos productos para comenzar</p>
+            <p-button
+              label="Ir al Marketplace"
+              icon="pi pi-arrow-left"
+              routerLink="/marketplace">
+            </p-button>
+          </div>
+        </p-card>
+      } @else {
+        @for (item of cartItems(); track item.id) {
+          <p-card class="mb-4">
+            <div class="flex items-center gap-4">
+              <!-- Imagen del producto -->
+              <div class="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0">
+                <img
+                  [src]="item.productImage || 'assets/product-placeholder.jpg'"
+                  [alt]="item.productName"
+                  class="w-full h-full object-cover rounded-lg">
+              </div>
+
+              <!-- Información del producto -->
+              <div class="flex-1">
+                <h3 class="font-semibold text-lg">{{ item.productName }}</h3>
+                <p class="text-green-600 font-bold">{{ '$' + item.productPrice }}</p>
+              </div>
+
+              <!-- Controles de cantidad -->
+              <div class="flex items-center gap-3">
+                <label class="text-sm font-medium">Cantidad:</label>
+                <p-inputNumber
+                  [ngModel]="item.quantity"
+                  (ngModelChange)="updateQuantity(item, $event)"
+                  [min]="1"
+                  [max]="100"
+                  [showButtons]="true"
+                  buttonLayout="horizontal"
+                  spinnerMode="horizontal"
+                  decrementButtonClass="p-button-secondary"
+                  incrementButtonClass="p-button-secondary"
+                  [style]="{'width': '120px'}">
+                </p-inputNumber>
+              </div>
+
+              <!-- Subtotal -->
+              <div class="text-right">
+                <p class="text-sm text-gray-600">Subtotal</p>
+                <p class="text-xl font-bold">{{ '$' + item.subtotal.toFixed(2) }}</p>
+              </div>
+
+              <!-- Botón eliminar -->
+              <p-button
+                icon="pi pi-trash"
+                severity="danger"
+                [outlined]="true"
+                [rounded]="true"
+                (click)="removeItem(item)"
+                pTooltip="Eliminar producto">
+              </p-button>
+            </div>
+          </p-card>
+        }
+      }
+    </div>
+
+    <!-- Resumen del carrito -->
+    <div class="col-span-12 lg:col-span-4">
+      <p-card>
+        <h2 class="text-xl font-bold mb-4">Resumen del Pedido</h2>
+
+        <div class="space-y-3 mb-6">
+          <div class="flex justify-between">
+            <span>Productos ({{ cartItems().length }})</span>
+            <span>{{ '$' + cartTotal().toFixed(2) }}</span>
+          </div>
+
+          <div class="flex justify-between">
+            <span>Envío</span>
+            <span class="text-green-600">Gratis</span>
+          </div>
+
+          <hr class="border-gray-200">
+
+          <div class="flex justify-between text-xl font-bold">
+            <span>Total</span>
+            <span>{{ '$' + cartTotal().toFixed(2) }}</span>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <p-button
+            label="Proceder al Checkout"
+            icon="pi pi-credit-card"
+            class="w-full"
+            [disabled]="cartItems().length === 0"
+            routerLink="/pedidos/checkout">
+          </p-button>
+
+          <p-button
+            label="Continuar Comprando"
+            icon="pi pi-arrow-left"
+            severity="secondary"
+            [outlined]="true"
+            class="w-full"
+            routerLink="/marketplace">
+          </p-button>
+        </div>
+      </p-card>
+    </div>
+  </div>
+</div>

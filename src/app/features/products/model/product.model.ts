@@ -3,9 +3,12 @@ export interface Product {
   name: string;
   price: number;
   description?: string;
-  quantity?: number;
+  quantity?: number | any;
   sku?: string;
   producer?: any;
   categoryIds?: number[];
   tagIds?: number[];
+  rating?: number;
+  image?: string;
+  inventoryStatus?: string;
 }

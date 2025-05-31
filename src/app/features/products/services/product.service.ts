@@ -22,6 +22,29 @@ export class ProductService {
     );
   }
 
+  getProducts(): Observable<Product[]> {
+    return this.http.get<Product[]>(`${this.apiUrl}/marketplace`).pipe(
+      map(products => products.map(product => ({
+        ...product,
+        stock: product.quantity,
+        active: true,
+        inventoryStatus: this.getInventoryStatus(product.quantity),
+        rating: product.rating || 4.5, // Rating por defecto si no existe
+        image: product.image || 'product-placeholder.jpg' // Imagen por defecto
+      })))
+    );
+  }
+
+  private getInventoryStatus(quantity: number): string {
+    if (quantity === 0) {
+      return 'AGOTADO';
+    } else if (quantity < 10) {
+      return 'BAJO STOCK';
+    } else {
+      return 'EN STOCK';
+    }
+  }
+
   getProductById(id: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${id}`);
   }

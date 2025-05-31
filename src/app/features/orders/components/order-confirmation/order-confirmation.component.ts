@@ -7,7 +7,7 @@ import {Order} from '../../model/order.model';
 @Component({
   selector: 'app-order-confirmation',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './order-confirmation.component.html',
   styleUrl: './order-confirmation.component.scss'
 })

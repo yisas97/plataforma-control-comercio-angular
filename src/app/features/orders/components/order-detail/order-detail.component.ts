@@ -7,7 +7,7 @@ import {Order} from '../../model/order.model';
 @Component({
   selector: 'app-order-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './order-detail.component.html',
   styleUrls: ['./order-detail.component.scss']
 })
@@ -51,16 +51,16 @@ export class OrderDetailComponent implements OnInit {
 
     if (confirm('¿Estás seguro de que deseas cancelar este pedido?')) {
       this.isLoading.set(true);
-      this.orderService.updateOrderStatus(this.order()!.id, 'CANCELLED').subscribe({
-        next: (data) => {
-          this.order.set(data);
-          this.isLoading.set(false);
-        },
-        error: (err) => {
-          console.error('Error cancelando pedido', err);
-          this.isLoading.set(false);
-        }
-      });
+      // this.orderService.updateOrderStatus(this.order()!.id, 'CANCELLED').subscribe({
+      //   next: (data) => {
+      //     this.order.set(data);
+      //     this.isLoading.set(false);
+      //   },
+      //   error: (err) => {
+      //     console.error('Error cancelando pedido', err);
+      //     this.isLoading.set(false);
+      //   }
+      // });
     }
   }
 
