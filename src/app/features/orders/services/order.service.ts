@@ -29,7 +29,6 @@ export class OrderService {
    * Obtener una orden específica por ID
    */
   getOrderById(orderId: number): Observable<Order> {
-    console.log(orderId);
     return this.http.get<Order>(`${this.apiUrl}/${orderId}`);
   }
 

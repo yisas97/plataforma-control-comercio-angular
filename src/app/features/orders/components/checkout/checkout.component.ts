@@ -82,9 +82,8 @@ export class CheckoutComponent implements OnInit {
             detail: `Tu pedido #${order.id} ha sido creado exitosamente`
           });
 
-          // Limpiar carrito y redirigir
           this.cartService.clearCart().subscribe(() => {
-            this.router.navigate(['/client/orders']);
+            this.router.navigate(['pedidos/order']);
           });
         },
         error: (error) => {

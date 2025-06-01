@@ -120,6 +120,7 @@ export class SidebarComponent {
           {label: 'Tiendas/Productores', icon: 'store', route: '/producers'}
         ]
       },
+      /**
       {
         title: 'MI CUENTA',
         items: [
@@ -130,11 +131,12 @@ export class SidebarComponent {
           {label: 'Notificaciones', icon: 'notifications', route: '/client/notifications'}
         ]
       },
+        **/
       {
         title: 'COMPRAS',
         items: [
           {label: 'Carrito de Compra', icon: 'shopping_cart', route: '/marketplace/cart'},
-          {label: 'Mis Pedidos', icon: 'receipt', route: '/client/orders'},
+          {label: 'Mis Pedidos', icon: 'receipt', route: '/pedidos/order'},
           {label: 'Historial de Compras', icon: 'history', route: '/client/purchase-history'}
         ]
       },
@@ -145,12 +147,6 @@ export class SidebarComponent {
           {label: 'Mis Valoraciones', icon: 'star', route: '/client/reviews'}
         ]
       },
-      {
-        title: 'COMUNICACIONES',
-        items: [
-          {label: 'Mensajes con Vendedores', icon: 'message', route: '/client/messages'}
-        ]
-      }
     ];
   }
 
