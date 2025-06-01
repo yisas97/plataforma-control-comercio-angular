@@ -1,1 +1,394 @@
-<p>producer-orders works!</p>
+<div class="producer-orders-container p-4">
+
+  <!-- Header con estadísticas rápidas -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold">Gestión de Pedidos</h1>
+      <p class="text-gray-600">Administra los pedidos de tus productos</p>
+    </div>
+    <p-button
+      label="Actualizar"
+      icon="pi pi-refresh"
+      [outlined]="true"
+      (click)="refreshData()">
+    </p-button>
+  </div>
+
+  <!-- Dashboard con estadísticas -->
+  @if (salesStats()) {
+    <div class="grid grid-cols-12 gap-4 mb-6">
+
+      <!-- Tarjetas de estadísticas -->
+      <div class="col-span-12 md:col-span-3">
+        <p-card styleClass="h-full">
+          <div class="text-center">
+            <i class="pi pi-shopping-bag text-4xl text-blue-600 mb-2"></i>
+            <h3 class="text-2xl font-bold">{{ salesStats()!.totalOrders }}</h3>
+            <p class="text-gray-600">Total Pedidos</p>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-span-12 md:col-span-3">
+        <p-card styleClass="h-full">
+          <div class="text-center">
+            <i class="pi pi-dollar text-4xl text-green-600 mb-2"></i>
+            <h3 class="text-2xl font-bold">{{ formatCurrency(salesStats()!.totalRevenue) }}</h3>
+            <p class="text-gray-600">Ingresos Totales</p>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-span-12 md:col-span-3">
+        <p-card styleClass="h-full">
+          <div class="text-center">
+            <i class="pi pi-clock text-4xl text-orange-600 mb-2"></i>
+            <h3 class="text-2xl font-bold">{{ salesStats()!.pendingOrders }}</h3>
+            <p class="text-gray-600">Pendientes</p>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-span-12 md:col-span-3">
+        <p-card styleClass="h-full">
+          <div class="text-center">
+            <i class="pi pi-calendar text-4xl text-purple-600 mb-2"></i>
+            <h3 class="text-2xl font-bold">{{ salesStats()!.todayOrders }}</h3>
+            <p class="text-gray-600">Hoy</p>
+          </div>
+        </p-card>
+      </div>
+
+    </div>
+  }
+
+  <!-- Tabs principales -->
+  <p-tabView>
+
+    <!-- Tab: Todos los pedidos -->
+    <p-tabPanel header="Todos los Pedidos" leftIcon="pi pi-list">
+
+      <!-- Filtros -->
+      <div class="flex gap-4 mb-4">
+        <div class="flex-1">
+          <label class="block text-sm font-medium mb-2">Filtrar por Estado</label>
+          <p-dropdown
+            [options]="statusOptions"
+            [(ngModel)]="selectedStatus"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Seleccionar estado"
+            class="w-full"
+            (onChange)="onStatusFilterChange()">
+          </p-dropdown>
+        </div>
+      </div>
+
+      <!-- Tabla de pedidos -->
+      @if (loading()) {
+        <div class="text-center p-8">
+          <i class="pi pi-spinner pi-spin text-4xl"></i>
+          <p class="mt-4">Cargando pedidos...</p>
+        </div>
+      } @else {
+        <p-table [value]="filteredOrders()" [paginator]="true" [rows]="10"
+                 [rowsPerPageOptions]="[5, 10, 20]" [loading]="loading()"
+                 styleClass="p-datatable-striped">
+
+          <ng-template pTemplate="header">
+            <tr>
+              <th>ID</th>
+              <th>Cliente</th>
+              <th>Total</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th>Acciones</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-order>
+            <tr>
+              <td>
+                <span class="font-mono">#{{ order.id }}</span>
+              </td>
+              <td>
+                <div>
+                  <div class="font-medium">{{ order.userName }}</div>
+                  <div class="text-sm text-gray-500">{{ order.userEmail }}</div>
+                </div>
+              </td>
+              <td>
+                <span class="font-bold text-green-600">{{ formatCurrency(order.totalAmount) }}</span>
+              </td>
+              <td>
+                <p-tag
+                  [value]="getOrderStatusText(order.status)"
+                  [severity]="getOrderStatusSeverity(order.status)">
+                </p-tag>
+              </td>
+              <td>
+                <span class="text-sm">{{ formatDate(order.createdAt) }}</span>
+              </td>
+              <td>
+                <div class="flex gap-2">
+                  <!-- Botón Ver Detalles -->
+                  <p-button
+                    icon="pi pi-eye"
+                    [rounded]="true"
+                    [outlined]="true"
+                    size="small"
+                    pTooltip="Ver detalles"
+                    (click)="viewOrderDetails(order)">
+                  </p-button>
+
+                  <!-- Botón Confirmar -->
+                  @if (canPerformAction(order, 'CONFIRMED')) {
+                    <p-button
+                      icon="pi pi-check"
+                      [rounded]="true"
+                      severity="success"
+                      size="small"
+                      pTooltip="Confirmar pedido"
+                      (click)="confirmOrder(order)">
+                    </p-button>
+                  }
+
+                  <!-- Botón Preparar -->
+                  @if (canPerformAction(order, 'PREPARING')) {
+                    <p-button
+                      icon="pi pi-cog"
+                      [rounded]="true"
+                      severity="info"
+                      size="small"
+                      pTooltip="Marcar como preparando"
+                      (click)="prepareOrder(order)">
+                    </p-button>
+                  }
+
+                  <!-- Botón Enviar -->
+                  @if (canPerformAction(order, 'SHIPPED')) {
+                    <p-button
+                      icon="pi pi-send"
+                      [rounded]="true"
+                      severity="secondary"
+                      size="small"
+                      pTooltip="Marcar como enviado"
+                      (click)="shipOrder(order)">
+                    </p-button>
+                  }
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="empty">
+            <tr>
+              <td colspan="6" class="text-center p-8">
+                <i class="pi pi-inbox text-4xl text-gray-400 mb-4"></i>
+                <p class="text-gray-600">No se encontraron pedidos</p>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      }
+    </p-tabPanel>
+
+    <!-- Tab: Pedidos de Hoy -->
+    <p-tabPanel header="Pedidos de Hoy" leftIcon="pi pi-calendar">
+      @if (todayOrders().length === 0) {
+        <div class="text-center p-8">
+          <i class="pi pi-calendar text-6xl text-gray-400 mb-4"></i>
+          <h3 class="text-xl font-semibold mb-2">No hay pedidos hoy</h3>
+          <p class="text-gray-600">Los nuevos pedidos aparecerán aquí</p>
+        </div>
+      } @else {
+        <div class="space-y-4">
+          @for (order of todayOrders(); track order.id) {
+            <p-card>
+              <div class="flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                  <div>
+                    <h3 class="font-semibold">Pedido #{{ order.id }}</h3>
+                    <p class="text-sm text-gray-600">{{ order.userName }} • {{ formatDate(order.createdAt) }}</p>
+                  </div>
+                  <p-tag
+                    [value]="getOrderStatusText(order.status)"
+                    [severity]="getOrderStatusSeverity(order.status)">
+                  </p-tag>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="text-xl font-bold text-green-600">{{ formatCurrency(order.totalAmount) }}</span>
+                  <p-button
+                    label="Ver Detalles"
+                    icon="pi pi-eye"
+                    [outlined]="true"
+                    size="small"
+                    (click)="viewOrderDetails(order)">
+                  </p-button>
+                </div>
+              </div>
+            </p-card>
+          }
+        </div>
+      }
+    </p-tabPanel>
+
+    <!-- Tab: Estadísticas -->
+    <p-tabPanel header="Estadísticas" leftIcon="pi pi-chart-line">
+      @if (salesStats()) {
+        <div class="grid grid-cols-12 gap-6">
+
+          <!-- Estadísticas por estado -->
+          <div class="col-span-12 md:col-span-6">
+            <p-card>
+              <ng-template pTemplate="header">
+                <h3 class="text-lg font-semibold p-4">Pedidos por Estado</h3>
+              </ng-template>
+
+              <div class="space-y-3">
+                <div class="flex justify-between items-center p-2 bg-yellow-50 rounded">
+                  <span class="flex items-center gap-2">
+                    <i class="pi pi-clock text-yellow-600"></i>
+                    Pendientes
+                  </span>
+                  <span class="font-bold">{{ salesStats()!.pendingOrders }}</span>
+                </div>
+
+                <div class="flex justify-between items-center p-2 bg-blue-50 rounded">
+                  <span class="flex items-center gap-2">
+                    <i class="pi pi-check text-blue-600"></i>
+                    Confirmados
+                  </span>
+                  <span class="font-bold">{{ salesStats()!.confirmedOrders }}</span>
+                </div>
+
+                <div class="flex justify-between items-center p-2 bg-purple-50 rounded">
+                  <span class="flex items-center gap-2">
+                    <i class="pi pi-cog text-purple-600"></i>
+                    Preparando
+                  </span>
+                  <span class="font-bold">{{ salesStats()!.preparingOrders }}</span>
+                </div>
+
+                <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                  <span class="flex items-center gap-2">
+                    <i class="pi pi-send text-gray-600"></i>
+                    Enviados
+                  </span>
+                  <span class="font-bold">{{ salesStats()!.shippedOrders }}</span>
+                </div>
+
+                <div class="flex justify-between items-center p-2 bg-green-50 rounded">
+                  <span class="flex items-center gap-2">
+                    <i class="pi pi-check-circle text-green-600"></i>
+                    Entregados
+                  </span>
+                  <span class="font-bold">{{ salesStats()!.deliveredOrders }}</span>
+                </div>
+              </div>
+            </p-card>
+          </div>
+
+          <!-- Estadísticas de tiempo -->
+          <div class="col-span-12 md:col-span-6">
+            <p-card>
+              <ng-template pTemplate="header">
+                <h3 class="text-lg font-semibold p-4">Rendimiento de Ventas</h3>
+              </ng-template>
+
+              <div class="space-y-4">
+                <div class="text-center p-4 border border-gray-200 rounded">
+                  <h4 class="text-sm text-gray-600">Promedio por Pedido</h4>
+                  <p class="text-2xl font-bold text-green-600">{{ formatCurrency(salesStats()!.averageOrderValue) }}</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="text-center p-3 bg-blue-50 rounded">
+                    <h5 class="text-xs text-blue-600">Esta Semana</h5>
+                    <p class="font-bold">{{ salesStats()!.thisWeekOrders }} pedidos</p>
+                    <p class="text-sm">{{ formatCurrency(salesStats()!.thisWeekRevenue) }}</p>
+                  </div>
+
+                  <div class="text-center p-3 bg-purple-50 rounded">
+                    <h5 class="text-xs text-purple-600">Este Mes</h5>
+                    <p class="font-bold">{{ salesStats()!.thisMonthOrders }} pedidos</p>
+                    <p class="text-sm">{{ formatCurrency(salesStats()!.thisMonthRevenue) }}</p>
+                  </div>
+                </div>
+              </div>
+            </p-card>
+          </div>
+
+        </div>
+      }
+    </p-tabPanel>
+
+  </p-tabView>
+
+  <!-- Dialog de detalles del pedido -->
+  <p-dialog
+    [(visible)]="showOrderDialog"
+    [modal]="true"
+    [closable]="true"
+    [style]="{'width': '80vw', 'max-width': '800px'}"
+    header="Detalles del Pedido">
+
+    @if (selectedOrder) {
+      <div class="space-y-4">
+
+        <!-- Información básica -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <h4 class="font-semibold mb-2">Información del Pedido</h4>
+            <p><strong>ID:</strong> #{{ selectedOrder.id }}</p>
+            <p><strong>Estado:</strong>
+              <p-tag
+                [value]="getOrderStatusText(selectedOrder.status)"
+                [severity]="getOrderStatusSeverity(selectedOrder.status)"
+                class="ml-2">
+              </p-tag>
+            </p>
+            <p><strong>Total:</strong> {{ formatCurrency(selectedOrder.totalAmount) }}</p>
+            <p><strong>Fecha:</strong> {{ formatDate(selectedOrder.createdAt) }}</p>
+          </div>
+
+          <div>
+            <h4 class="font-semibold mb-2">Información del Cliente</h4>
+            <p><strong>Nombre:</strong> {{ selectedOrder.userName }}</p>
+            <p><strong>Email:</strong> {{ selectedOrder.userEmail }}</p>
+            <p><strong>Dirección:</strong> {{ selectedOrder.shippingAddress }}</p>
+            <p><strong>Pago:</strong> {{ selectedOrder.paymentMethod }}</p>
+          </div>
+        </div>
+
+        <!-- Productos del pedido -->
+        <div>
+          <h4 class="font-semibold mb-3">Productos del Pedido</h4>
+          <div class="space-y-2">
+            @for (item of selectedOrder.orderItems; track item.id) {
+              <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                <div>
+                  <p class="font-medium">{{ item.productName }}</p>
+                  <p class="text-sm text-gray-600">Cantidad: {{ item.quantity }}</p>
+                </div>
+                <div class="text-right">
+                  <p class="font-semibold">{{ formatCurrency(item.subtotal) }}</p>
+                  <p class="text-sm text-gray-600">{{ formatCurrency(item.price) }} c/u</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (selectedOrder.notes) {
+          <div>
+            <h4 class="font-semibold mb-2">Notas del Cliente</h4>
+            <p class="p-3 bg-yellow-50 border border-yellow-200 rounded">{{ selectedOrder.notes }}</p>
+          </div>
+        }
+
+      </div>
+    }
+  </p-dialog>
+
+</div>

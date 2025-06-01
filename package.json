@@ -24,6 +24,7 @@
     "@ngrx/store": "^19.1.0",
     "@ngrx/store-devtools": "^19.1.0",
     "@primeng/themes": "^19.1.2",
+    "chart.js": "^4.4.9",
     "jwt-decode": "^4.0.0",
     "ngx-store": "^3.1.1",
     "primeicons": "^7.0.0",

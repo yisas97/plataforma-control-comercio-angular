@@ -90,7 +90,7 @@ export class SidebarComponent implements OnInit {
         title: 'Mi Perfil de Tienda',
         items: [
           {label: 'Información Basica', icon: 'bar_chart', route: '/producer/profile/info'},
-          {label: 'Galeria', icon: 'bar_chart', route: '/producer/profile/gallery'}
+          {label: 'Mis Pedidos', icon: 'receipt', route: '/producer/orders'}
         ]
       },
       {

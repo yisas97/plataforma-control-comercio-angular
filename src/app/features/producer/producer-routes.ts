@@ -8,5 +8,10 @@ export  const PRODUCER_ROUTES = [
     path: 'products',
     loadComponent: () => import('./components/producer-products/producer-products.component')
       .then(c => c.ProducerProductsComponent)
+  },
+  {
+    path: 'orders',
+    loadComponent: () => import('./components/producer-orders/producer-orders.component')
+      .then(c => c.ProducerOrdersComponent)
   }
 ];

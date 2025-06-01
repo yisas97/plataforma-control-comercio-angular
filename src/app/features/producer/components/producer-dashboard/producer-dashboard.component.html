@@ -1,1 +1,261 @@
-<p>producer-dashboard works!</p>
+<div class="producer-dashboard p-4">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold">Dashboard del Productor</h1>
+      <p class="text-gray-600">Resumen de tu negocio y ventas</p>
+    </div>
+    <p-button
+      label="Actualizar"
+      icon="pi pi-refresh"
+      [outlined]="true"
+      (click)="refreshDashboard()">
+    </p-button>
+  </div>
+
+  @if (loading()) {
+    <div class="text-center p-8">
+      <i class="pi pi-spinner pi-spin text-4xl"></i>
+      <p class="mt-4">Cargando datos del dashboard...</p>
+    </div>
+  } @else if (salesStats()) {
+
+    <!-- Métricas principales -->
+    <div class="grid grid-cols-12 gap-4 mb-6">
+
+      <div class="col-span-12 md:col-span-3">
+        <p-card styleClass="h-full bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+          <div class="text-center">
+            <i class="pi pi-shopping-bag text-4xl mb-3 opacity-80"></i>
+            <h3 class="text-3xl font-bold mb-1">{{ salesStats()!.totalOrders }}</h3>
+            <p class="opacity-90">Pedidos Totales</p>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-span-12 md:col-span-3">
+        <p-card styleClass="h-full bg-gradient-to-r from-green-500 to-green-600 text-white">
+          <div class="text-center">
+            <i class="pi pi-dollar text-4xl mb-3 opacity-80"></i>
+            <h3 class="text-3xl font-bold mb-1">{{ formatCurrency(salesStats()!.totalRevenue) }}</h3>
+            <p class="opacity-90">Ingresos Totales</p>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-span-12 md:col-span-3">
+        <p-card styleClass="h-full bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+          <div class="text-center">
+            <i class="pi pi-clock text-4xl mb-3 opacity-80"></i>
+            <h3 class="text-3xl font-bold mb-1">{{ salesStats()!.pendingOrders }}</h3>
+            <p class="opacity-90">Pedidos Pendientes</p>
+            @if (salesStats()!.pendingOrders > 0) {
+              <p class="text-xs mt-1 opacity-75">¡Requieren atención!</p>
+            }
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-span-12 md:col-span-3">
+        <p-card styleClass="h-full bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+          <div class="text-center">
+            <i class="pi pi-calendar text-4xl mb-3 opacity-80"></i>
+            <h3 class="text-3xl font-bold mb-1">{{ salesStats()!.todayOrders }}</h3>
+            <p class="opacity-90">Pedidos Hoy</p>
+            <p class="text-xs mt-1 opacity-75">{{ formatCurrency(salesStats()!.todayRevenue) }}</p>
+          </div>
+        </p-card>
+      </div>
+
+    </div>
+
+    <!-- Gráficos y análisis -->
+    <div class="grid grid-cols-12 gap-6 mb-6">
+
+      <!-- Gráfico de estados de pedidos -->
+      <div class="col-span-12 lg:col-span-6">
+        <p-card>
+          <ng-template pTemplate="header">
+            <h3 class="text-lg font-semibold p-4">Estados de Pedidos</h3>
+          </ng-template>
+
+          <div style="height: 300px;">
+            <p-chart
+              type="doughnut"
+              [data]="orderStatusChartData"
+              [options]="chartOptions"
+              height="300">
+            </p-chart>
+          </div>
+        </p-card>
+      </div>
+
+      <!-- Gráfico de ingresos -->
+      <div class="col-span-12 lg:col-span-6">
+        <p-card>
+          <ng-template pTemplate="header">
+            <h3 class="text-lg font-semibold p-4">Ingresos por Período</h3>
+          </ng-template>
+
+          <div style="height: 300px;">
+            <p-chart
+              type="bar"
+              [data]="revenueChartData"
+              [options]="chartOptions"
+              height="300">
+            </p-chart>
+          </div>
+        </p-card>
+      </div>
+
+    </div>
+
+    <!-- Estadísticas detalladas y acciones rápidas -->
+    <div class="grid grid-cols-12 gap-6">
+
+      <!-- Pedidos recientes -->
+      <div class="col-span-12 lg:col-span-8">
+        <p-card>
+          <ng-template pTemplate="header">
+            <div class="flex justify-between items-center p-4">
+              <h3 class="text-lg font-semibold">Pedidos Recientes</h3>
+              <p-button
+                label="Ver Todos"
+                icon="pi pi-external-link"
+                [outlined]="true"
+                size="small"
+                routerLink="/producer/orders">
+              </p-button>
+            </div>
+          </ng-template>
+
+          @if (recentOrders().length === 0) {
+            <div class="text-center p-8">
+              <i class="pi pi-inbox text-4xl text-gray-400 mb-4"></i>
+              <p class="text-gray-600">No hay pedidos recientes</p>
+            </div>
+          } @else {
+            <div class="space-y-3">
+              @for (order of recentOrders(); track order.id) {
+                <div class="flex justify-between items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                  <div class="flex items-center gap-4">
+                    <div>
+                      <h4 class="font-semibold">Pedido #{{ order.id }}</h4>
+                      <p class="text-sm text-gray-600">
+                        {{ order.userName }} • {{ formatDate(order.createdAt) }}
+                      </p>
+                    </div>
+                    <p-tag
+                      [value]="getOrderStatusText(order.status)"
+                      [severity]="getOrderStatusSeverity(order.status)">
+                    </p-tag>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="text-lg font-bold text-green-600">
+                      {{ formatCurrency(order.totalAmount) }}
+                    </span>
+                    <p-button
+                      icon="pi pi-arrow-right"
+                      [rounded]="true"
+                      [outlined]="true"
+                      size="small"
+                      [routerLink]="['/producer/orders']">
+                    </p-button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </p-card>
+      </div>
+
+      <!-- Acciones rápidas y estadísticas -->
+      <div class="col-span-12 lg:col-span-4">
+
+        <!-- Acciones rápidas -->
+        <p-card class="mb-4">
+          <ng-template pTemplate="header">
+            <h3 class="text-lg font-semibold p-4">Acciones Rápidas</h3>
+          </ng-template>
+
+          <div class="space-y-3">
+            <p-button
+              label="Gestionar Pedidos"
+              icon="pi pi-list"
+              class="w-full"
+              routerLink="/producer/orders">
+            </p-button>
+
+            <p-button
+              label="Mis Productos"
+              icon="pi pi-box"
+              severity="secondary"
+              class="w-full"
+              routerLink="/producer/products">
+            </p-button>
+          </div>
+        </p-card>
+
+        <!-- Estadísticas adicionales -->
+        <p-card>
+          <ng-template pTemplate="header">
+            <h3 class="text-lg font-semibold p-4">Rendimiento</h3>
+          </ng-template>
+
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">Promedio por Pedido</span>
+              <span class="font-bold text-lg">{{ formatCurrency(salesStats()!.averageOrderValue) }}</span>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">Pedidos Esta Semana</span>
+              <span class="font-bold">{{ salesStats()!.thisWeekOrders }}</span>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">Ingresos Esta Semana</span>
+              <span class="font-bold text-green-600">{{ formatCurrency(salesStats()!.thisWeekRevenue) }}</span>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">Pedidos Este Mes</span>
+              <span class="font-bold">{{ salesStats()!.thisMonthOrders }}</span>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">Ingresos Este Mes</span>
+              <span class="font-bold text-green-600">{{ formatCurrency(salesStats()!.thisMonthRevenue) }}</span>
+            </div>
+          </div>
+        </p-card>
+
+      </div>
+
+    </div>
+
+  } @else {
+    <!-- Estado sin datos -->
+    <div class="text-center p-12">
+      <i class="pi pi-chart-line text-6xl text-gray-400 mb-4"></i>
+      <h3 class="text-xl font-semibold mb-2">¡Bienvenido a tu Dashboard!</h3>
+      <p class="text-gray-600 mb-6">Cuando recibas tus primeros pedidos, aquí verás todas las estadísticas</p>
+      <div class="space-x-3">
+        <p-button
+          label="Agregar Productos"
+          icon="pi pi-plus"
+          routerLink="/producer/products/new">
+        </p-button>
+        <p-button
+          label="Ver Marketplace"
+          icon="pi pi-external-link"
+          severity="secondary"
+          [outlined]="true"
+          routerLink="/marketplace">
+        </p-button>
+      </div>
+    </div>
+  }
+
+</div>
