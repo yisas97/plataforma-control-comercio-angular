@@ -1,4 +1,4 @@
-import {Component, inject, Input} from '@angular/core';
+import {Component, HostBinding, inject, Input, OnInit} from '@angular/core';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {SidebarGroup, SidebarItem} from './sidebar.model';
@@ -12,9 +12,14 @@ import {PERFILES} from '../../utils/perfi.utils';
   standalone: true,
   styleUrl: './sidebar.component.scss'
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
   @Input() collapsed = false;
   private authService = inject(AuthService);
+
+  @HostBinding('class.collapsed')
+  get isCollapsed() {
+    return this.collapsed;
+  }
 
   sidebarGroups: SidebarGroup[] = [];
   userRole: string = '';

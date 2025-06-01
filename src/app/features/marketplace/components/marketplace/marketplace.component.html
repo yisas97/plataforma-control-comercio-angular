@@ -2,7 +2,6 @@
   <p-dataview #dv [value]="products()">
     <ng-template #list let-items>
       <div class="grid grid-cols-12 gap-4 grid-nogutter">
-        <!-- Opción 1: Usar el nuevo @for de Angular 17+ (recomendado) -->
         @for (item of items; track item.id; let first = $first) {
           <div class="col-span-12">
             <div

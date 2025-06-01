@@ -33,7 +33,7 @@ export class MarketplaceComponent implements OnInit {
   ngOnInit() {
     this.marketplaceService.getProducts()
       .subscribe((data: Product[]) => {
-        const d = data.slice(0, 5);
+        const d = data.slice(0, 20);
         this.products.set([...d]);
       });
   }

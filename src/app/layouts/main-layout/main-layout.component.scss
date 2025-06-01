@@ -1,52 +1,66 @@
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 .app-layout {
-  display: flex;
   min-height: 100vh;
   width: 100%;
-  overflow: hidden;
+  background-color: #f7f9fc;
+  padding-left: 260px;
+  transition: padding-left 0.3s ease;
+
+  &.sidebar-collapsed {
+    padding-left: 64px;
+  }
 }
 
 .sidebar {
-  flex: 0 0 auto;
-  width: 260px;
-  transition: width 0.3s ease;
-  height: 100vh; /* IMPORTANTE: Altura completa para la pantalla */
-  position: sticky; /* Mantiene el sidebar fijo al hacer scroll */
-  top: 0;
-  left: 0;
-  overflow-y: auto; /* Permite desplazamiento vertical dentro del sidebar */
-  overflow-x: hidden; /* Evita desplazamiento horizontal */
-}
-
-.sidebar-collapsed .sidebar {
-  width: 80px;
+  //Vacio
 }
 
 .main-content {
-  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  width: calc(100% - 260px);
-  transition: width 0.3s ease;
-  min-height: 100vh; /* Asegura que el contenido tenga la altura completa */
-  position: relative; /* Contexto de posicionamiento para elementos absolutos */
-}
-
-.sidebar-collapsed .main-content {
-  width: calc(100% - 80px);
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f7f9fc;
 }
 
 .page-content {
-  flex: 1 1 auto;
+  flex: 1;
   padding: 20px;
-  overflow-y: auto; /* Permite desplazamiento vertical */
+  overflow-y: auto;
+  overflow-x: hidden;
   background-color: #f7f9fc;
-  min-height: calc(100vh - 60px - 64px); /* Altura de viewport - altura de header - altura del footer */
-  position: relative; /* Contexto de posicionamiento para elementos internos */
+  min-height: calc(100vh - 120px);
+
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
 }
+
 .footer {
   flex: 0 0 auto;
   z-index: 10;
 }
+
 
 :host ::ng-deep .p-dropdown-panel {
   z-index: 1000 !important;
@@ -54,4 +68,33 @@
 
 :host ::ng-deep .p-component-overlay {
   z-index: 999 !important;
+}
+
+:host ::ng-deep .p-toast {
+  z-index: 1100 !important;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: -260px;
+    z-index: 1001;
+    transition: left 0.3s ease;
+
+    &.show {
+      left: 0;
+    }
+  }
+
+  .sidebar-collapsed .sidebar {
+    left: -64px;
+
+    &.show {
+      left: 0;
+    }
+  }
+
+  .main-content {
+    width: 100%;
+  }
 }
