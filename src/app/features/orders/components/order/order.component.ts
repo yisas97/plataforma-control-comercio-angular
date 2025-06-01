@@ -7,6 +7,7 @@ import {Card} from 'primeng/card';
 import {Tag} from 'primeng/tag';
 import {RouterLink} from '@angular/router';
 import {Accordion, AccordionTab} from 'primeng/accordion';
+import {ToastModule} from 'primeng/toast';
 
 @Component({
   selector: 'app-order',
@@ -16,6 +17,7 @@ import {Accordion, AccordionTab} from 'primeng/accordion';
     Tag,
     RouterLink,
     Accordion,
+    ToastModule,
     AccordionTab
   ],
   templateUrl: './order.component.html',

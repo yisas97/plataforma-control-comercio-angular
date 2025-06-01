@@ -8,6 +8,7 @@ import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {MessageService} from 'primeng/api';
 import {InputNumber} from 'primeng/inputnumber';
+import {ToastModule} from 'primeng/toast';
 
 @Component({
   selector: 'app-cart',
@@ -19,6 +20,7 @@ import {InputNumber} from 'primeng/inputnumber';
     Button,
     ReactiveFormsModule,
     InputNumber,
+    ToastModule
   ],
   providers: [MessageService],
   standalone: true,

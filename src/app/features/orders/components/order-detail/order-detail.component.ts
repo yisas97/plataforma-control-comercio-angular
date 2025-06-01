@@ -8,11 +8,12 @@ import {Divider} from 'primeng/divider';
 import {Card} from 'primeng/card';
 import {Button} from 'primeng/button';
 import {Tag} from 'primeng/tag';
+import {ToastModule} from 'primeng/toast';
 
 @Component({
   selector: 'app-order-detail',
   standalone: true,
-  imports: [CommonModule, Divider, Card, Button, Tag],
+  imports: [CommonModule, Divider, Card, Button, Tag, ToastModule],
   providers: [MessageService, RouterLink],
   templateUrl: './order-detail.component.html',
   styleUrls: ['./order-detail.component.scss']

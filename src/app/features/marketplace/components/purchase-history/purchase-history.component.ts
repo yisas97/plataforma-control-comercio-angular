@@ -9,6 +9,7 @@ import {Card} from 'primeng/card';
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
 import {Calendar} from 'primeng/calendar';
+import {ToastModule} from 'primeng/toast';
 
 @Component({
   selector: 'app-purchase-history',
@@ -19,7 +20,8 @@ import {Calendar} from 'primeng/calendar';
     Card,
     DropdownModule,
     FormsModule,
-    Calendar
+    Calendar,
+    ToastModule
   ],
   standalone: true,
   providers: [OrderService, MessageService],

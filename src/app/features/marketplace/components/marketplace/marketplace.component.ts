@@ -12,6 +12,7 @@ import {FormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
 import {Card} from 'primeng/card';
 import {DropdownModule} from 'primeng/dropdown';
+import {Toast, ToastModule} from 'primeng/toast';
 
 @Component({
   selector: 'app-marketplace',
@@ -23,7 +24,8 @@ import {DropdownModule} from 'primeng/dropdown';
     FormsModule,
     InputText,
     Card,
-    DropdownModule
+    DropdownModule,
+    ToastModule,
   ],
   templateUrl: './marketplace.component.html',
   providers: [ProductService, MessageService],

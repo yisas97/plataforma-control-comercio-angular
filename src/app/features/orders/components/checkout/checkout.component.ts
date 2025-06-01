@@ -8,11 +8,17 @@ import {Button} from 'primeng/button';
 import {CartService} from '../../../marketplace/services/cart.service';
 import {RadioButton} from 'primeng/radiobutton';
 import {Card} from 'primeng/card';
+import {ToastModule} from 'primeng/toast';
 
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, Button, RadioButton, Card],
+  imports: [CommonModule,
+    FormsModule, ReactiveFormsModule,
+    Button, RadioButton,
+    Card,
+    ToastModule
+  ],
   providers: [MessageService],
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.scss'

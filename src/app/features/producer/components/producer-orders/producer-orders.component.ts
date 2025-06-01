@@ -13,6 +13,7 @@ import {DropdownModule} from 'primeng/dropdown';
 import {TableModule} from 'primeng/table';
 import {Tag} from 'primeng/tag';
 import {Tooltip} from 'primeng/tooltip';
+import {ToastModule} from 'primeng/toast';
 
 @Component({
   selector: 'app-producer-orders',
@@ -28,6 +29,7 @@ import {Tooltip} from 'primeng/tooltip';
     TableModule,
     Tag,
     Tooltip,
+    ToastModule
   ],
   providers: [MessageService, ProducerOrderService],
   templateUrl: './producer-orders.component.html',
