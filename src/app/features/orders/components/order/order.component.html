@@ -45,6 +45,17 @@
                 [severity]="getOrderStatusSeverity(order.status)">
               </p-tag>
 
+              @if (canConfirmDelivery(order)) {
+                <p-button
+                  label="Confirmar Entrega"
+                  icon="pi pi-check"
+                  severity="success"
+                  [outlined]="true"
+                  size="small"
+                  (click)="confirmDelivery(order)">
+                </p-button>
+              }
+
               @if (canCancelOrder(order)) {
                 <p-button
                   label="Cancelar"
@@ -61,7 +72,7 @@
                 icon="pi pi-eye"
                 [outlined]="true"
                 size="small"
-                [routerLink]="['/pedidos/order', order.id]">
+                [routerLink]="['/client/orders', order.id]">
               </p-button>
             </div>
           </div>

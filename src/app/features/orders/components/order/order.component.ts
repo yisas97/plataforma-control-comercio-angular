@@ -25,6 +25,7 @@ import {Accordion, AccordionTab} from 'primeng/accordion';
 })
 export class OrderComponent implements OnInit {
 
+
   private orderService = inject(OrderService);
   private messageService = inject(MessageService);
 
@@ -81,8 +82,38 @@ export class OrderComponent implements OnInit {
     }
   }
 
+  confirmDelivery(order: Order) {
+    this.orderService.confirmDelivery(order.id).subscribe({
+      next: (updatedOrder) => {
+        const currentOrders = this.orders();
+        const index = currentOrders.findIndex(o => o.id === order.id);
+        if (index !== -1) {
+          currentOrders[index] = updatedOrder;
+          this.orders.set([...currentOrders]);
+        }
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Entrega confirmada',
+          detail: `Has confirmado la recepción del pedido #${order.id}`
+        });
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo confirmar la entrega'
+        });
+      }
+    });
+  }
+
+  canConfirmDelivery(order: Order): boolean {
+    return order.status === 'SHIPPED';
+  }
+
   canCancelOrder(order: Order): boolean {
-    return order.status === 'PENDING' || order.status === 'CONFIRMED';
+    return order.status === 'PENDING';
   }
 
   getOrderStatusText(status: string): string {

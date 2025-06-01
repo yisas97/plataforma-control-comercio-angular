@@ -76,4 +76,5 @@ export class OrderService {
   confirmDelivery(orderId: number): Observable<Order> {
     return this.http.put<Order>(`${this.apiUrl}/${orderId}/confirm-delivery`, {});
   }
+
 }
