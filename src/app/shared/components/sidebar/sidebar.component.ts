@@ -142,7 +142,7 @@ export class SidebarComponent implements OnInit {
         items: [
           {label: 'Carrito de Compra', icon: 'shopping_cart', route: '/marketplace/cart'},
           {label: 'Mis Pedidos', icon: 'receipt', route: '/pedidos/order'},
-          {label: 'Historial de Compras', icon: 'history', route: '/client/purchase-history'}
+          {label: 'Historial de Compras', icon: 'history', route: '/marketplace/purchase-history'}
         ]
       },
       {

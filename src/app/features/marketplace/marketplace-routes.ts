@@ -8,5 +8,10 @@ export  const MARKETPLACE_ROUTE = [
     path: 'cart',
     loadComponent: () => import('./components/cart/cart.component')
       .then(c => c.CartComponent)
+  },
+  {
+    path: 'purchase-history',
+    loadComponent: () => import('./components/purchase-history/purchase-history.component')
+      .then(c => c.PurchaseHistoryComponent)
   }
 ];

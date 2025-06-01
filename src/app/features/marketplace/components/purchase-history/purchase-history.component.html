@@ -1,0 +1,220 @@
+<div class="purchase-history-container p-4">
+
+  <!-- Header con estadísticas -->
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold mb-2">Historial de Compras</h1>
+    <p class="text-gray-600 mb-4">Todas tus compras completadas y entregadas</p>
+
+    <!-- Estadísticas rápidas -->
+    @if (deliveredOrders().length > 0) {
+      <div class="grid grid-cols-12 gap-4 mb-6">
+        <div class="col-span-12 md:col-span-4">
+          <div class="bg-blue-50 p-4 rounded-lg text-center">
+            <h3 class="text-2xl font-bold text-blue-600">{{ getOrderCount() }}</h3>
+            <p class="text-blue-700">Compras Realizadas</p>
+          </div>
+        </div>
+        <div class="col-span-12 md:col-span-4">
+          <div class="bg-green-50 p-4 rounded-lg text-center">
+            <h3 class="text-2xl font-bold text-green-600">{{ formatCurrency(getTotalSpent()) }}</h3>
+            <p class="text-green-700">Total Gastado</p>
+          </div>
+        </div>
+        <div class="col-span-12 md:col-span-4">
+          <div class="bg-purple-50 p-4 rounded-lg text-center">
+            <h3 class="text-2xl font-bold text-purple-600">{{ formatCurrency(getAverageOrderValue()) }}</h3>
+            <p class="text-purple-700">Promedio por Compra</p>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Filtros -->
+  <p-card class="mb-6">
+    <ng-template pTemplate="header">
+      <h2 class="text-xl font-semibold p-4">Filtrar Historial</h2>
+    </ng-template>
+
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-12 md:col-span-3">
+        <label class="block text-sm font-medium mb-2">Año</label>
+        <p-dropdown
+          [options]="yearOptions"
+          [(ngModel)]="selectedYear"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccionar año"
+          class="w-full"
+          (onChange)="applyFilters()">
+        </p-dropdown>
+      </div>
+
+      <div class="col-span-12 md:col-span-3">
+        <label class="block text-sm font-medium mb-2">Mes</label>
+        <p-dropdown
+          [options]="monthOptions"
+          [(ngModel)]="selectedMonth"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccionar mes"
+          class="w-full"
+          (onChange)="applyFilters()">
+        </p-dropdown>
+      </div>
+
+      <div class="col-span-12 md:col-span-4">
+        <label class="block text-sm font-medium mb-2">Rango de Fechas</label>
+        <p-calendar
+          [(ngModel)]="dateRange"
+          selectionMode="range"
+          [readonlyInput]="true"
+          placeholder="Seleccionar rango"
+          class="w-full"
+          (onSelect)="applyFilters()">
+        </p-calendar>
+      </div>
+
+      <div class="col-span-12 md:col-span-2 flex items-end">
+        <p-button
+          label="Limpiar"
+          icon="pi pi-filter-slash"
+          severity="secondary"
+          [outlined]="true"
+          class="w-full"
+          (click)="clearFilters()">
+        </p-button>
+      </div>
+    </div>
+  </p-card>
+
+  <!-- Lista de compras -->
+  @if (loading()) {
+    <div class="text-center p-8">
+      <i class="pi pi-spinner pi-spin text-4xl"></i>
+      <p class="mt-4">Cargando historial de compras...</p>
+    </div>
+  } @else if (deliveredOrders().length === 0) {
+    <p-card>
+      <div class="text-center p-12">
+        <i class="pi pi-shopping-bag text-6xl text-gray-400 mb-4"></i>
+        <h3 class="text-xl font-semibold mb-2">No tienes compras completadas</h3>
+        <p class="text-gray-600 mb-6">Cuando completes tus primeras compras, aparecerán aquí</p>
+        <div class="space-x-3">
+          <p-button
+            label="Ir al Marketplace"
+            icon="pi pi-shopping-cart"
+            routerLink="/marketplace">
+          </p-button>
+          <p-button
+            label="Ver Mis Pedidos"
+            icon="pi pi-list"
+            severity="secondary"
+            [outlined]="true"
+            routerLink="/client/orders">
+          </p-button>
+        </div>
+      </div>
+    </p-card>
+  } @else if (filteredOrders().length === 0) {
+    <p-card>
+      <div class="text-center p-8">
+        <i class="pi pi-filter text-4xl text-gray-400 mb-4"></i>
+        <h3 class="text-lg font-semibold mb-2">No se encontraron compras</h3>
+        <p class="text-gray-600 mb-4">Intenta ajustar los filtros de búsqueda</p>
+        <p-button
+          label="Limpiar Filtros"
+          icon="pi pi-filter-slash"
+          (click)="clearFilters()">
+        </p-button>
+      </div>
+    </p-card>
+  } @else {
+
+    <!-- Resultados -->
+    <div class="space-y-4 mb-6">
+      @for (order of getPaginatedOrders(); track order.id) {
+        <p-card>
+          <div class="flex flex-col lg:flex-row justify-between gap-4">
+
+            <!-- Información principal -->
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-3">
+                <h3 class="text-lg font-semibold">Compra #{{ order.id }}</h3>
+                <span class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
+                  ✓ Entregado
+                </span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p class="text-gray-600">Fecha de compra:</p>
+                  <p class="font-medium">{{ formatDate(order.createdAt) }}</p>
+                </div>
+                <div>
+                  <p class="text-gray-600">Total pagado:</p>
+                  <p class="font-bold text-green-600 text-lg">{{ formatCurrency(order.totalAmount) }}</p>
+                </div>
+                <div>
+                  <p class="text-gray-600">Productos:</p>
+                  <p class="font-medium">{{ order.orderItems.length }} artículo(s)</p>
+                </div>
+                <div>
+                  <p class="text-gray-600">Método de pago:</p>
+                  <p class="font-medium">{{ order.paymentMethod }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Productos comprados -->
+            <div class="lg:w-96">
+              <h4 class="font-semibold mb-2">Productos:</h4>
+              <div class="space-y-2 max-h-32 overflow-y-auto">
+                @for (item of order.orderItems; track item.id) {
+                  <div class="flex justify-between items-center text-sm bg-gray-50 p-2 rounded">
+                    <span>{{ item.productName }}</span>
+                    <span class="font-medium">{{ item.quantity }}x {{ formatCurrency(item.price) }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="flex lg:flex-col gap-2 lg:w-32">
+              <p-button
+                label="Ver Detalles"
+                icon="pi pi-eye"
+                [outlined]="true"
+                size="small"
+                class="flex-1"
+                [routerLink]="['/client/orders', order.id]">
+              </p-button>
+
+              <p-button
+                label="Recomprar"
+                icon="pi pi-refresh"
+                severity="secondary"
+                [outlined]="true"
+                size="small"
+                class="flex-1"
+                (click)="reorderItems(order)">
+              </p-button>
+            </div>
+
+          </div>
+        </p-card>
+      }
+    </div>
+
+    <!-- Paginador -->
+    <p-paginator
+      [first]="first"
+      [rows]="rows"
+      [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[5, 10, 20, 50]"
+      (onPageChange)="onPageChange($event)">
+    </p-paginator>
+
+  }
+
+</div>

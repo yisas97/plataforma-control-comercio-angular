@@ -61,9 +61,6 @@ export class OrderService {
     return statusMap[status] || status;
   }
 
-  /**
-   * Obtener severidad para PrimeNG Tag según el estado
-   */
   getOrderStatusSeverity(status: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
     const severityMap: { [key: string]: 'success' | 'info' | 'warn' | 'danger' | 'secondary' } = {
       'PENDING': 'warn',
@@ -74,5 +71,9 @@ export class OrderService {
       'CANCELLED': 'danger'
     };
     return severityMap[status] || 'secondary';
+  }
+
+  confirmDelivery(orderId: number): Observable<Order> {
+    return this.http.put<Order>(`${this.apiUrl}/${orderId}/confirm-delivery`, {});
   }
 }
