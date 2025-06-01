@@ -3,6 +3,7 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {environment} from '../../../../environments/environment';
 import {map, Observable} from 'rxjs';
 import {Product} from '../model/product.model';
+import {Producer} from '../../producer/model/producer.model';
 
 @Injectable({
   providedIn: 'root'
@@ -29,11 +30,61 @@ export class ProductService {
         stock: product.quantity,
         active: true,
         inventoryStatus: this.getInventoryStatus(product.quantity),
-        rating: product.rating || 4.5, // Rating por defecto si no existe
-        image: product.image || 'product-placeholder.jpg' // Imagen por defecto
+        rating: product.rating || 4.5,
+        image: product.image || 'product-placeholder.jpg'
       })))
     );
   }
+
+  getProducers(): Observable<Producer[]> {
+    return this.http.get<Producer[]>(`${this.apiUrl}/marketplace/producers`);
+  }
+
+  getProductsByProducer(producerId: number): Observable<Product[]> {
+    return this.http.get<Product[]>(`${this.apiUrl}/marketplace/producers/${producerId}/products`).pipe(
+      map(products => products.map(product => ({
+        ...product,
+        stock: product.quantity,
+        active: true,
+        inventoryStatus: this.getInventoryStatus(product.quantity),
+        rating: product.rating || 4.5,
+        image: product.image || 'product-placeholder.jpg'
+      })))
+    );
+  }
+
+  searchProductsByProducer(producerName: string): Observable<Product[]> {
+    const params = new HttpParams().set('producerName', producerName);
+    return this.http.get<Product[]>(`${this.apiUrl}/marketplace/search/producer`, { params }).pipe(
+      map(products => products.map(product => ({
+        ...product,
+        stock: product.quantity,
+        active: true,
+        inventoryStatus: this.getInventoryStatus(product.quantity),
+        rating: product.rating || 4.5,
+        image: product.image || 'product-placeholder.jpg'
+      })))
+    );
+  }
+
+  searchProducts(name: string): Observable<Product[]> {
+    const params = new HttpParams().set('name', name);
+    return this.http.get<Product[]>(`${this.apiUrl}/marketplace/search`, { params }).pipe(
+      map(products => products.map(product => ({
+        ...product,
+        stock: product.quantity,
+        active: true,
+        inventoryStatus: this.getInventoryStatus(product.quantity),
+        rating: product.rating || 4.5,
+        image: product.image || 'product-placeholder.jpg'
+      })))
+    );
+  }
+
+  getProductById(id: number): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}/marketplace/${id}`);
+  }
+
 
   private getInventoryStatus(quantity: number): string {
     if (quantity === 0) {
@@ -43,10 +94,6 @@ export class ProductService {
     } else {
       return 'EN STOCK';
     }
-  }
-
-  getProductById(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`);
   }
 
   createProduct(product: any): Observable<any> {
@@ -75,20 +122,38 @@ export class ProductService {
     return this.http.delete<any>(`${this.apiUrl}/${id}`);
   }
 
-  searchProducts(name: string): Observable<any[]> {
-    const params = new HttpParams().set('name', name);
-    return this.http.get<any[]>(`${this.apiUrl}/search`, { params });
+  getProductsByCategory(categoryId: number): Observable<Product[]> {
+    return this.http.get<Product[]>(`${this.apiUrl}/marketplace/by-category/${categoryId}`).pipe(
+      map(products => products.map(product => ({
+        ...product,
+        stock: product.quantity,
+        active: true,
+        inventoryStatus: this.getInventoryStatus(product.quantity),
+        rating: product.rating || 4.5,
+        image: product.image || 'product-placeholder.jpg'
+      })))
+    );
   }
 
-  getProductsByCategory(categoryId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/by-category/${categoryId}`);
+  getProductsByTag(tagId: number): Observable<Product[]> {
+    return this.http.get<Product[]>(`${this.apiUrl}/marketplace/by-tag/${tagId}`).pipe(
+      map(products => products.map(product => ({
+        ...product,
+        stock: product.quantity,
+        active: true,
+        inventoryStatus: this.getInventoryStatus(product.quantity),
+        rating: product.rating || 4.5,
+        image: product.image || 'product-placeholder.jpg'
+      })))
+    );
   }
 
-  getProductsByTag(tagId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/by-tag/${tagId}`);
-  }
-
-  filterProducts(categoryIds?: number[], tagIds?: number[]): Observable<any[]> {
+  filterProducts(
+    categoryIds?: number[],
+    tagIds?: number[],
+    minPrice?: number,
+    maxPrice?: number
+  ): Observable<Product[]> {
     let params = new HttpParams();
 
     if (categoryIds && categoryIds.length > 0) {
@@ -103,7 +168,24 @@ export class ProductService {
       });
     }
 
-    return this.http.get<any[]>(`${this.apiUrl}/filter`, { params });
+    if (minPrice !== undefined) {
+      params = params.set('minPrice', minPrice.toString());
+    }
+
+    if (maxPrice !== undefined) {
+      params = params.set('maxPrice', maxPrice.toString());
+    }
+
+    return this.http.get<Product[]>(`${this.apiUrl}/marketplace/filter`, { params }).pipe(
+      map(products => products.map(product => ({
+        ...product,
+        stock: product.quantity,
+        active: true,
+        inventoryStatus: this.getInventoryStatus(product.quantity),
+        rating: product.rating || 4.5,
+        image: product.image || 'product-placeholder.jpg'
+      })))
+    );
   }
 
   addCategoryToProduct(productId: number, categoryId: number): Observable<void> {
@@ -120,6 +202,19 @@ export class ProductService {
 
   removeTagFromProduct(productId: number, tagId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${productId}/tags/${tagId}`);
+  }
+
+  getFeaturedProducts(): Observable<Product[]> {
+    return this.http.get<Product[]>(`${this.apiUrl}/marketplace/featured`).pipe(
+      map(products => products.map(product => ({
+        ...product,
+        stock: product.quantity,
+        active: true,
+        inventoryStatus: this.getInventoryStatus(product.quantity),
+        rating: product.rating || 4.5,
+        image: product.image || 'product-placeholder.jpg'
+      })))
+    );
   }
 
 }

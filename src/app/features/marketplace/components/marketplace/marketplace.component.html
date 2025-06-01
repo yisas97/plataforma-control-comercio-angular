@@ -1,66 +1,260 @@
-<div class="card">
-  <p-dataview #dv [value]="products()">
-    <ng-template #list let-items>
-      <div class="grid grid-cols-12 gap-4 grid-nogutter">
-        @for (item of items; track item.id; let first = $first) {
-          <div class="col-span-12">
-            <div
-              class="flex flex-col sm:flex-row sm:items-center p-6 gap-4"
-              [ngClass]="{ 'border-t border-surface-200 dark:border-surface-700': !first }"
-            >
-              <div class="md:w-40 relative">
-                <img
-                  class="block xl:block mx-auto rounded-border w-full"
-                  [src]="'https://primefaces.org/cdn/primeng/images/demo/product/' + item.image"
-                  [alt]="item.name"
-                />
-                <p-tag
-                  [value]="item.inventoryStatus"
-                  [severity]="getSeverity(item)"
-                  class="absolute"
-                  styleClass="dark:!bg-surface-900"
-                  [style.left.px]="4"
-                  [style.top.px]="4"
-                />
+<div class="marketplace-container p-4">
+
+  <!-- Header del marketplace -->
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold mb-2">Marketplace Local</h1>
+    <p class="text-gray-600">Descubre productos frescos de productores locales</p>
+  </div>
+
+  <!-- Filtros de productores -->
+  <p-card class="mb-6">
+    <ng-template pTemplate="header">
+      <h2 class="text-xl font-semibold p-4">Filtrar por Productores</h2>
+    </ng-template>
+
+    <div class="grid grid-cols-12 gap-4">
+
+      <!-- Dropdown de productores -->
+      <div class="col-span-12 md:col-span-4">
+        <label for="producerSelect" class="block text-sm font-medium mb-2">
+          Seleccionar Productor
+        </label>
+        <p-dropdown
+          inputId="producerSelect"
+          [options]="producers()"
+          [(ngModel)]="selectedProducer"
+          optionLabel="businessName"
+          placeholder="Todos los productores"
+          [showClear]="true"
+          class="w-full"
+          (onChange)="onProducerChange()">
+
+          <ng-template pTemplate="selectedItem" let-producer>
+            <div class="flex items-center gap-2">
+              <i class="pi pi-shop text-green-600"></i>
+              <span>{{ producer.businessName }}</span>
+              <span class="text-sm text-gray-500">({{ producer.productCount }} productos)</span>
+            </div>
+          </ng-template>
+
+          <ng-template pTemplate="item" let-producer>
+            <div class="flex items-center gap-2 p-2">
+              <i class="pi pi-shop text-green-600"></i>
+              <div>
+                <div class="font-medium">{{ producer.businessName }}</div>
+                <div class="text-sm text-gray-500">{{ producer.location }} • {{ producer.productCount }} productos</div>
               </div>
-              <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
-                <div class="flex flex-row md:flex-col justify-between items-start gap-2">
-                  <div>
-                    <span class="font-medium text-secondary text-sm">{{ item.category }}</span>
-                    <div class="text-lg font-medium text-surface-900 dark:text-surface-0 mt-2">{{item.name}} - {{ item.description }}</div>
-                  </div>
-                  <div class="bg-surface-100 dark:bg-surface-700 p-1" style="border-radius: 30px">
-                    <div
-                      class="bg-surface-0 dark:bg-surface-900 flex items-center gap-2 justify-center py-1 px-2"
-                      style="border-radius: 30px; box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.04), 0px 1px 2px 0px rgba(0, 0, 0, 0.06)"
-                    >
-                      <span class="text-surface-900 dark:text-surface-0 font-medium text-sm">{{
-                          item.rating
-                        }}</span>
-                      <i class="pi pi-star-fill text-yellow-500"></i>
+            </div>
+          </ng-template>
+        </p-dropdown>
+      </div>
+
+      <!-- Búsqueda por nombre de productor -->
+      <div class="col-span-12 md:col-span-4">
+        <label for="producerSearch" class="block text-sm font-medium mb-2">
+          Buscar por Nombre de Productor
+        </label>
+        <div class="flex gap-2">
+          <input
+            id="producerSearch"
+            type="text"
+            pInputText
+            [(ngModel)]="searchProducerText"
+            placeholder="Ej: Granja Orgánica..."
+            class="flex-1"
+            (keyup.enter)="searchByProducerName()">
+          <p-button
+            icon="pi pi-search"
+            [outlined]="true"
+            (click)="searchByProducerName()">
+          </p-button>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="col-span-12 md:col-span-4 flex items-end gap-2">
+        <p-button
+          label="Limpiar Filtros"
+          icon="pi pi-filter-slash"
+          severity="secondary"
+          [outlined]="true"
+          (click)="clearFilters()">
+        </p-button>
+
+        <p-button
+          label="Actualizar"
+          icon="pi pi-refresh"
+          [outlined]="true"
+          (click)="loadInitialData()">
+        </p-button>
+      </div>
+
+    </div>
+  </p-card>
+
+  <!-- Información del filtro activo -->
+  @if (selectedProducer) {
+    <div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <i class="pi pi-filter text-blue-600"></i>
+          <div>
+            <h3 class="font-semibold text-blue-900">Mostrando productos de:</h3>
+            <p class="text-blue-700">{{ selectedProducer.businessName }} - {{ selectedProducer.location }}</p>
+          </div>
+        </div>
+        <p-button
+          icon="pi pi-times"
+          [rounded]="true"
+          [outlined]="true"
+          severity="secondary"
+          size="small"
+          (click)="clearFilters()">
+        </p-button>
+      </div>
+    </div>
+  }
+
+  @if (searchProducerText) {
+    <div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <i class="pi pi-search text-green-600"></i>
+          <div>
+            <h3 class="font-semibold text-green-900">Búsqueda activa:</h3>
+            <p class="text-green-700">Productores que contienen "{{ searchProducerText }}"</p>
+          </div>
+        </div>
+        <p-button
+          icon="pi pi-times"
+          [rounded]="true"
+          [outlined]="true"
+          severity="secondary"
+          size="small"
+          (click)="clearFilters()">
+        </p-button>
+      </div>
+    </div>
+  }
+
+  <!-- Lista de productos -->
+  <div class="card">
+    @if (loading()) {
+      <div class="text-center p-8">
+        <i class="pi pi-spinner pi-spin text-4xl text-blue-600"></i>
+        <p class="mt-4 text-gray-600">Cargando productos...</p>
+      </div>
+    } @else {
+      <p-dataview #dv [value]="products()" [loading]="loading()">
+        <ng-template pTemplate="header">
+          <div class="flex justify-between items-center">
+            <h2 class="text-xl font-semibold">
+              Productos Disponibles ({{ products().length }})
+            </h2>
+          </div>
+        </ng-template>
+
+        <ng-template #list let-items>
+          @if (items.length === 0) {
+            <div class="text-center p-8">
+              <i class="pi pi-inbox text-6xl text-gray-400 mb-4"></i>
+              <h3 class="text-xl font-semibold mb-2">No se encontraron productos</h3>
+              <p class="text-gray-600 mb-4">
+                @if (selectedProducer || searchProducerText) {
+                  Intenta ajustar los filtros o buscar otros productores
+                } @else {
+                  No hay productos disponibles en este momento
+                }
+              </p>
+              @if (selectedProducer || searchProducerText) {
+                <p-button
+                  label="Ver Todos los Productos"
+                  icon="pi pi-eye"
+                  (click)="clearFilters()">
+                </p-button>
+              }
+            </div>
+          } @else {
+            <div class="grid grid-cols-12 gap-4 grid-nogutter">
+              @for (item of items; track item.id; let first = $first) {
+                <div class="col-span-12">
+                  <div
+                    class="flex flex-col sm:flex-row sm:items-center p-6 gap-4"
+                    [ngClass]="{ 'border-t border-surface-200 dark:border-surface-700': !first }"
+                  >
+                    <div class="md:w-40 relative">
+                      <img
+                        class="block xl:block mx-auto rounded-border w-full"
+                        [src]="'https://primefaces.org/cdn/primeng/images/demo/product/' + item.image"
+                        [alt]="item.name"
+                      />
+                      <p-tag
+                        [value]="item.inventoryStatus"
+                        [severity]="getSeverity(item)"
+                        class="absolute"
+                        styleClass="dark:!bg-surface-900"
+                        [style.left.px]="4"
+                        [style.top.px]="4"
+                      />
+                    </div>
+                    <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
+                      <div class="flex flex-row md:flex-col justify-between items-start gap-2">
+                        <div>
+                          <span class="font-medium text-secondary text-sm">{{ item.category }}</span>
+                          <div class="text-lg font-medium text-surface-900 dark:text-surface-0 mt-2">{{ item.name }}</div>
+                          <!-- Información del productor -->
+                          <div class="flex items-center gap-1 mt-1">
+                            <i class="pi pi-shop text-xs text-green-600"></i>
+                            <span class="text-xs text-gray-600">
+                              Vendido por:
+                              <button
+                                class="font-medium text-green-700 hover:text-green-800 hover:underline cursor-pointer bg-transparent border-none p-0"
+                                (click)="filterByProducerName(item.producerName)"
+                                [disabled]="!item.producerName"
+                                pTooltip="Filtrar productos de este productor">
+                                {{ item.producerName || 'Productor' }}
+                              </button>
+                              @if (item.producerLocation) {
+                                <span class="text-gray-500"> • {{ item.producerLocation }}</span>
+                              }
+                            </span>
+                          </div>
+                        </div>
+                        <div class="bg-surface-100 dark:bg-surface-700 p-1" [style]="{'border-radius': '30px'}">
+                          <div
+                            class="bg-surface-0 dark:bg-surface-900 flex items-center gap-2 justify-center py-1 px-2"
+                            [style]="{'border-radius': '30px', 'box-shadow': '0px 1px 2px 0px rgba(0, 0, 0, 0.04), 0px 1px 2px 0px rgba(0, 0, 0, 0.06)'}"
+                          >
+                            <span class="text-surface-900 dark:text-surface-0 font-medium text-sm">{{
+                                item.rating
+                              }}</span>
+                            <i class="pi pi-star-fill text-yellow-500"></i>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex flex-col md:items-end gap-8">
+                        <span class="text-xl font-semibold text-surface-900 dark:text-surface-0">{{
+                            '$' + item.price
+                          }}</span>
+                        <div class="flex flex-row-reverse md:flex-row gap-2">
+                          <p-button icon="pi pi-heart" [outlined]="true" />
+                          <p-button
+                            icon="pi pi-shopping-cart"
+                            class="flex-auto md:flex-initial whitespace-nowrap"
+                            label="Comprar Ahora"
+                            [disabled]="item.inventoryStatus === 'OUTOFSTOCK'"
+                            (click)="addToCart(item)"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div class="flex flex-col md:items-end gap-8">
-                  <span class="text-xl font-semibold text-surface-900 dark:text-surface-0">{{
-                      '$' + item.price
-                    }}</span>
-                  <div class="flex flex-row-reverse md:flex-row gap-2">
-                    <p-button icon="pi pi-heart" [outlined]="true" />
-                    <p-button
-                      icon="pi pi-shopping-cart"
-                      class="flex-auto md:flex-initial whitespace-nowrap"
-                      label="Comprar Ahora"
-                      [disabled]="item.inventoryStatus === 'OUTOFSTOCK'"
-                      (click)="addToCart(item)"
-                    />
-                  </div>
-                </div>
-              </div>
+              }
             </div>
-          </div>
-        }
-      </div>
-    </ng-template>
-  </p-dataview>
+          }
+        </ng-template>
+      </p-dataview>
+    }
+  </div>
 </div>
