@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+  <contexts>
+    <context>
+      <name>Angular Application</name>
+      <desc>Configuración para aplicaciones Angular</desc>
+      <incregexs>http://localhost:4200.*</incregexs>
+      <excregexs></excregexs>
+      <tech>
+        <include>Angular</include>
+        <include>JavaScript</include>
+        <include>HTML</include>
+      </tech>
+      <urlparser>
+        <class>org.zaproxy.zap.model.StandardParameterParser</class>
+        <config></config>
+      </urlparser>
+      <postparser>
+        <class>org.zaproxy.zap.model.StandardParameterParser</class>
+        <config></config>
+      </postparser>
+      <datadriven>0</datadriven>
+    </context>
+  </contexts>
+
+  <!-- Configuración para ignorar alertas específicas de Angular -->
+  <alertFilters>
+    <!-- CSP: script-src unsafe-inline -->
+    <alertFilter>
+      <ruleId>10055</ruleId>
+      <newRisk>-1</newRisk>
+      <context>Angular Application</context>
+      <url>http://localhost:4200.*</url>
+      <enabled>true</enabled>
+    </alertFilter>
+
+    <!-- CSP: style-src unsafe-inline -->
+    <alertFilter>
+      <ruleId>10056</ruleId>
+      <newRisk>-1</newRisk>
+      <context>Angular Application</context>
+      <url>http://localhost:4200.*</url>
+      <enabled>true</enabled>
+    </alertFilter>
+
+    <!-- CSP: Directiva Wildcard -->
+    <alertFilter>
+      <ruleId>10038</ruleId>
+      <newRisk>-1</newRisk>
+      <context>Angular Application</context>
+      <url>http://localhost:4200.*</url>
+      <enabled>true</enabled>
+    </alertFilter>
+
+    <!-- CSP: script-src unsafe-eval -->
+    <alertFilter>
+      <ruleId>10057</ruleId>
+      <newRisk>-1</newRisk>
+      <context>Angular Application</context>
+      <url>http://localhost:4200.*</url>
+      <enabled>true</enabled>
+    </alertFilter>
+  </alertFilters>
+</configuration>

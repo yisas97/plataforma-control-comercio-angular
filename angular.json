@@ -36,7 +36,14 @@
               "src/styles/main.scss",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "optimization": true,
+            "extractLicenses": false,
+            "sourceMap": false,
+            "namedChunks": false,
+            "aot": true,
+            "outputHashing": "all",
+            "crossOrigin": "none"
           },
           "configurations": {
             "production": {
