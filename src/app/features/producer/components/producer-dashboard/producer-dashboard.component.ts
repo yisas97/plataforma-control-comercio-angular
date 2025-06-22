@@ -8,6 +8,9 @@ import {Card} from 'primeng/card';
 import {Tag} from 'primeng/tag';
 import {ChartModule } from 'primeng/chart';
 import {PrimeTemplate} from 'primeng/api';
+import {BlockchainService} from '../../../products/services/blockchain.service';
+import {ProductService} from '../../../products/services/product.service';
+import {NgClass} from '@angular/common';
 
 @Component({
   selector: 'app-producer-dashboard',
@@ -16,8 +19,9 @@ import {PrimeTemplate} from 'primeng/api';
     RouterLink,
     Card,
     Tag,
-    ChartModule ,
-    PrimeTemplate
+    ChartModule,
+    PrimeTemplate,
+    NgClass
   ],
   templateUrl: './producer-dashboard.component.html',
   standalone: true,
@@ -26,10 +30,13 @@ import {PrimeTemplate} from 'primeng/api';
 export class ProducerDashboardComponent implements OnInit {
 
   private producerOrderService = inject(ProducerOrderService);
+  private blockchainService = inject(BlockchainService);
+  private productService = inject(ProductService);
 
   salesStats = signal<ProducerSalesStats | null>(null);
   recentOrders = signal<Order[]>([]);
   loading = signal(false);
+  recentProducts = signal<any[]>([]);
 
   orderStatusChartData: any;
   revenueChartData: any;
@@ -38,6 +45,7 @@ export class ProducerDashboardComponent implements OnInit {
   ngOnInit() {
     this.setupChartOptions();
     this.loadDashboardData();
+    this.loadRecentProducts();
   }
 
   loadDashboardData() {
@@ -57,6 +65,33 @@ export class ProducerDashboardComponent implements OnInit {
       this.loading.set(false);
     }).catch(() => {
       this.loading.set(false);
+    });
+  }
+
+  loadRecentProducts() {
+    this.productService.getProducerProducts().subscribe({
+      next: (products) => {
+        const recent = products.slice(0, 5).map(product => ({
+          ...product,
+          hasCertificate: true
+        }));
+        this.recentProducts.set(recent);
+      },
+      error: (error) => {
+        console.error('Error loading recent products:', error);
+      }
+    });
+  }
+
+  checkCertificate(productId: number) {
+    this.blockchainService.getCertificate(productId).subscribe({
+      next: (certificate) => {
+        console.log('Certificate found:', certificate);
+        // Mostrar toast de éxito
+      },
+      error: (error) => {
+        console.log('No certificate found for product:', productId);
+      }
     });
   }
 

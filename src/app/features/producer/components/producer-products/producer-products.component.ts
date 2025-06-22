@@ -14,6 +14,10 @@ import {ColumnDefinition, TemplateMantenimientoComponent} from '../../../../shar
 import {ProductService} from '../../../products/services/product.service';
 import {CategoryService} from '../../../admin/services';
 import {Textarea} from 'primeng/textarea';
+import {BlockchainService} from '../../../products/services/blockchain.service';
+import {Dialog} from 'primeng/dialog';
+import {Tooltip} from 'primeng/tooltip';
+import {DeleteProductResponse} from '../../../products/model/delete-response.model';
 
 @Component({
   selector: 'app-producer-products',
@@ -28,7 +32,9 @@ import {Textarea} from 'primeng/textarea';
     CheckboxModule,
     ToastModule,
     TemplateMantenimientoComponent,
-    Textarea
+    Textarea,
+    Dialog,
+    Tooltip
   ],
   providers: [MessageService],
   templateUrl: './producer-products.component.html',
@@ -45,6 +51,7 @@ export class ProducerProductsComponent implements OnInit {
   private categoryService = inject(CategoryService);
   private router = inject(Router);
   private messageService = inject(MessageService);
+  private blockchainService = inject(BlockchainService);
 
   products: any[] = [];
   selectedProduct: any = null;
@@ -55,11 +62,28 @@ export class ProducerProductsComponent implements OnInit {
   showFormModal: boolean = false;
   showDeleteModal: boolean = false;
 
+  showCertificateModal = false;
+  selectedCertificate: any = null;
+  certificateData: any = null;
+  loadingCertificate = false;
+
   cols: ColumnDefinition[] = [
     {field: 'name', header: 'Nombre', type: 'text'},
     {field: 'categoryName', header: 'Categoría', type: 'text'},
     {field: 'price', header: 'Precio', type: 'currency', format: {decimals: 2}},
     {field: 'quantity', header: 'Stock', type: 'number'},
+    {
+      field: 'status',
+      header: 'Estado',
+      type: 'boolean',
+      format: {
+        trueLabel: 'Activo',
+        falseLabel: 'Inactivo',
+        trueClass: 'text-green-600 font-semibold',
+        falseClass: 'text-red-600 font-semibold'
+      }
+    },
+    {field: 'blockchainStatus', header: 'Blockchain', type: 'text'},
   ];
 
   globalFilterFields: string[] = ['name', 'categoryName'];
@@ -86,9 +110,7 @@ export class ProducerProductsComponent implements OnInit {
     this.loading = true;
     this.productService.getProducerProducts().subscribe({
       next: (data) => {
-        // Transformar y preparar los datos para mostrarlos en la tabla
         this.products = data.map(product => {
-          // Obtener los nombres de las categorías para mostrar
           const categoryNames = product.categoryIds
             ? product.categoryIds.map((catId: number) => {
               const cat = this.categories.find(c => c.id === catId);
@@ -99,8 +121,10 @@ export class ProducerProductsComponent implements OnInit {
           return {
             ...product,
             categoryName: categoryNames,
-            // Asegurar que tenga el campo 'active' (que parece que no viene del backend)
-            active: product.active !== undefined ? product.active : true
+            blockchainStatus: '✅ Certificado',
+            hasCertificate: true,
+            status: product.active !== false, // 🔧 Cambiar a boolean para el tipo boolean de la columna
+            showReactivateButton: product.active === false,
           };
         });
         this.loading = false;
@@ -115,6 +139,43 @@ export class ProducerProductsComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  viewCertificate(product: any) {
+    if (product.id) {
+      this.showCertificateModal = true;
+      this.loadingCertificate = true;
+      this.selectedCertificate = null;
+      this.certificateData = null;
+
+      this.blockchainService.getCertificate(product.id).subscribe({
+        next: (certificate) => {
+          this.selectedCertificate = certificate;
+          this.certificateData = this.blockchainService.parseCertificateData(certificate.certificateData);
+          this.loadingCertificate = false;
+
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Certificado Cargado',
+            detail: 'Certificado blockchain encontrado'
+          });
+        },
+        error: (error) => {
+          this.loadingCertificate = false;
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Certificado',
+            detail: 'No se encontró certificado para este producto'
+          });
+        }
+      });
+    }
+  }
+
+  closeCertificateModal() {
+    this.showCertificateModal = false;
+    this.selectedCertificate = null;
+    this.certificateData = null;
   }
 
   loadCategories(): void {
@@ -169,15 +230,32 @@ export class ProducerProductsComponent implements OnInit {
     this.showDeleteModal = true;
   }
 
-  onDeleteConfirm(): void {
-    if (this.selectedProduct && this.selectedProduct.id) {
-      this.productService.deleteProduct(this.selectedProduct.id).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Éxito',
-            detail: 'Producto eliminado correctamente'
-          });
+  onDeleteConfirm(product: any): void {
+    if (product && product.id) {
+      this.productService.deleteProduct(product.id).subscribe({
+        next: (response: DeleteProductResponse) => {
+          if (response.success) {
+            if (response.markedInactive) {
+              this.messageService.add({
+                severity: 'warning',
+                summary: 'Producto Desactivado',
+                detail: response.message + '. Puedes reactivarlo desde la tabla.',
+                life: 8000
+              });
+            } else {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Producto Eliminado',
+                detail: response.message
+              });
+            }
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: response.message
+            });
+          }
           this.loadProducts();
         },
         error: (error) => {
@@ -185,11 +263,34 @@ export class ProducerProductsComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'Error al eliminar el producto'
+            detail: 'Error inesperado al procesar la solicitud'
           });
         }
       });
     }
+  }
+
+  reactivateProduct(product: any): void {
+    this.productService.reactivateProduct(product.id).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Producto Reactivado',
+            detail: response.message
+          });
+          this.loadProducts();
+        }
+      },
+      error: (error) => {
+        console.error('Error reactivating product', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error al reactivar el producto'
+        });
+      }
+    });
   }
 
   onSave(): void {

@@ -170,6 +170,68 @@
         </p-card>
       </div>
 
+    <div class="col-span-12 lg:col-span-8">
+      <p-card>
+        <ng-template pTemplate="header">
+          <div class="flex justify-between items-center p-4">
+            <h3 class="text-lg font-semibold">Productos Recientes</h3>
+            <p-button
+              label="Ver Todos"
+              icon="pi pi-external-link"
+              [outlined]="true"
+              size="small"
+              routerLink="/producer/products">
+            </p-button>
+          </div>
+        </ng-template>
+
+        @if (recentProducts().length === 0) {
+          <div class="text-center p-8">
+            <i class="pi pi-box text-4xl text-gray-400 mb-4"></i>
+            <p class="text-gray-600">No hay productos registrados</p>
+          </div>
+        } @else {
+          <div class="space-y-3">
+            @for (product of recentProducts(); track product.id) {
+              <div class="flex justify-between items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                <div class="flex items-center gap-4">
+                  <div>
+                    <h4 class="font-semibold">{{ product.name }}</h4>
+                    <p class="text-sm text-gray-600">
+                      Stock: {{ product.quantity }} • S/. {{ product.price }}
+                    </p>
+                  </div>
+
+                  <!-- 🆕 Estado del certificado blockchain -->
+                  <div class="certificate-status">
+                    <div class="flex items-center gap-2 px-3 py-1 rounded-full"
+                         [ngClass]="product.hasCertificate ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'">
+                      <i class="pi text-xs"
+                         [ngClass]="product.hasCertificate ? 'pi-shield-check' : 'pi-clock'"></i>
+                      <span class="text-xs font-medium">
+                    {{ product.hasCertificate ? 'Certificado Blockchain' : 'Generando certificado...' }}
+                  </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <button
+                    class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                    (click)="checkCertificate(product.id)"
+                    [disabled]="!product.hasCertificate"
+                    title="Ver certificado blockchain">
+                    <i class="pi pi-eye mr-1"></i>
+                    Ver Certificado
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </p-card>
+    </div>
+
       <!-- Acciones rápidas y estadísticas -->
       <div class="col-span-12 lg:col-span-4">
 

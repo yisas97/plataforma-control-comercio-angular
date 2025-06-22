@@ -2,7 +2,7 @@ import {Component, inject, OnInit, signal} from '@angular/core';
 import {Button} from 'primeng/button';
 import {Tag} from 'primeng/tag';
 import {DataView} from 'primeng/dataview';
-import {NgClass} from '@angular/common';
+import {DatePipe, NgClass, NgIf} from '@angular/common';
 import {ProductService} from '../../../products/services/product.service';
 import {Product} from '../../../products/model/product.model';
 import {MessageService} from 'primeng/api';
@@ -13,6 +13,9 @@ import {InputText} from 'primeng/inputtext';
 import {Card} from 'primeng/card';
 import {DropdownModule} from 'primeng/dropdown';
 import {Toast, ToastModule} from 'primeng/toast';
+import {CertificateData, ProductCertificate} from '../../../products/model/blockchain.model';
+import {BlockchainService} from '../../../products/services/blockchain.service';
+import {Dialog} from 'primeng/dialog';
 
 @Component({
   selector: 'app-marketplace',
@@ -26,6 +29,9 @@ import {Toast, ToastModule} from 'primeng/toast';
     Card,
     DropdownModule,
     ToastModule,
+    DatePipe,
+    Dialog,
+    NgIf,
   ],
   templateUrl: './marketplace.component.html',
   providers: [ProductService, MessageService],
@@ -43,6 +49,12 @@ export class MarketplaceComponent implements OnInit {
   marketplaceService = inject(ProductService);
   cartService = inject(CartService);
   messageService = inject(MessageService);
+  blockchainService = inject(BlockchainService);
+
+  showCertificateModal = false;
+  selectedCertificate: ProductCertificate | null = null;
+  certificateData: CertificateData | null = null;
+  loadingCertificate = false;
 
   ngOnInit() {
     this.loadInitialData();
@@ -66,6 +78,36 @@ export class MarketplaceComponent implements OnInit {
         detail: 'Error al cargar datos del marketplace'
       });
     });
+  }
+
+  showCertificate(productId: number) {
+    this.showCertificateModal = true;
+    this.loadingCertificate = true;
+    this.selectedCertificate = null;
+    this.certificateData = null;
+
+    this.blockchainService.getCertificate(productId).subscribe({
+      next: (certificate) => {
+        this.selectedCertificate = certificate;
+        this.certificateData = this.blockchainService.parseCertificateData(certificate.certificateData);
+        this.loadingCertificate = false;
+      },
+      error: (error) => {
+        console.error('Error loading certificate:', error);
+        this.loadingCertificate = false;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo cargar el certificado blockchain'
+        });
+      }
+    });
+  }
+
+  closeCertificateModal() {
+    this.showCertificateModal = false;
+    this.selectedCertificate = null;
+    this.certificateData = null;
   }
 
   onProducerChange() {

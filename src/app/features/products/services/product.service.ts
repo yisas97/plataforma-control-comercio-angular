@@ -4,6 +4,7 @@ import {environment} from '../../../../environments/environment';
 import {map, Observable} from 'rxjs';
 import {Product} from '../model/product.model';
 import {Producer} from '../../producer/model/producer.model';
+import {DeleteProductResponse, ReactivateProductResponse} from '../model/delete-response.model';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,9 @@ export class ProductService {
       map(products => products.map(product => ({
         ...product,
         stock: product.quantity,
-        active: true
+        active: product.active !== undefined ? product.active : true,
+        status: product.active === false ? 'Inactivo' : 'Activo',
+        statusSeverity: product.active === false ? 'danger' : 'success'
       })))
     );
   }
@@ -118,8 +121,12 @@ export class ProductService {
     return this.http.put<any>(`${this.apiUrl}/${id}`, product);
   }
 
-  deleteProduct(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${id}`);
+  deleteProduct(id: number): Observable<DeleteProductResponse> {
+    return this.http.delete<DeleteProductResponse>(`${this.apiUrl}/${id}`);
+  }
+
+  reactivateProduct(id: number): Observable<ReactivateProductResponse> {
+    return this.http.put<ReactivateProductResponse>(`${this.apiUrl}/${id}/reactivate`, {});
   }
 
   getProductsByCategory(categoryId: number): Observable<Product[]> {

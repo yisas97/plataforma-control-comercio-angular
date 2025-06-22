@@ -236,6 +236,19 @@
                         <span class="text-xl font-semibold text-surface-900 dark:text-surface-0">{{
                             '$' + item.price
                           }}</span>
+
+                        <div class="blockchain-section mb-3">
+                          <button
+                            class="blockchain-badge"
+                            (click)="showCertificate(item.id!)"
+                            pTooltip="Ver certificado de autenticidad blockchain"
+                            tooltipPosition="top">
+                            <i class="pi pi-shield-check"></i>
+                            <span>Certificado Blockchain</span>
+                            <small>Verificar autenticidad</small>
+                          </button>
+                        </div>
+
                         <div class="flex flex-row-reverse md:flex-row gap-2">
                           <p-button icon="pi pi-heart" [outlined]="true" />
                           <p-button
@@ -257,4 +270,113 @@
       </p-dataview>
     }
   </div>
+
+  <p-dialog
+    header="🔗 Certificado Blockchain"
+    [(visible)]="showCertificateModal"
+    [modal]="true"
+    [draggable]="false"
+    [closable]="true"
+    [style]="{width: '700px'}"
+    [maximizable]="true">
+
+    <ng-template pTemplate="content">
+      <!-- Loading state -->
+      <div *ngIf="loadingCertificate" class="text-center p-8">
+        <i class="pi pi-spinner pi-spin text-4xl text-blue-600 mb-4"></i>
+        <p class="text-gray-600">Cargando certificado blockchain...</p>
+      </div>
+
+      <!-- Certificate content -->
+      <div *ngIf="selectedCertificate && !loadingCertificate" class="certificate-content">
+
+        <!-- Verification status -->
+        <div class="verification-status text-center mb-6">
+          <div class="verified-badge">
+            <i class="pi pi-check-circle mr-2"></i>
+            Producto Verificado
+          </div>
+          <p class="text-sm text-gray-600 mt-2">
+            Este producto ha sido certificado usando tecnología blockchain
+          </p>
+        </div>
+
+        <!-- Certificate details -->
+        <div class="certificate-details">
+          <div class="grid grid-cols-12 gap-4">
+
+            <!-- Hash information -->
+            <div class="col-span-12">
+              <h4 class="font-semibold mb-3 text-gray-800">Información de Certificación</h4>
+            </div>
+
+            <div class="col-span-12 md:col-span-6">
+              <label class="text-sm font-medium text-gray-600">Hash Blockchain:</label>
+              <div class="hash-display">
+                {{ selectedCertificate!.blockchainHash }}
+              </div>
+            </div>
+
+            <div class="col-span-12 md:col-span-6">
+              <label class="text-sm font-medium text-gray-600">Hash de Transacción:</label>
+              <div class="hash-display">
+                {{ selectedCertificate!.transactionHash }}
+              </div>
+            </div>
+
+            <div class="col-span-12">
+              <label class="text-sm font-medium text-gray-600">Fecha de Certificación:</label>
+              <p class="font-medium">{{ selectedCertificate!.createdDate | date:'medium' }}</p>
+            </div>
+
+            <!-- Product information -->
+            <div class="col-span-12" *ngIf="certificateData">
+              <h4 class="font-semibold mb-3 mt-4 text-gray-800">Información del Producto</h4>
+              <div class="product-info-grid">
+                <div class="info-item">
+                  <span class="label">Producto:</span>
+                  <span class="value">{{ certificateData!.productName }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Productor:</span>
+                  <span class="value">{{ certificateData!.producerName }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Ubicación:</span>
+                  <span class="value">{{ certificateData!.producerLocation }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">SKU:</span>
+                  <span class="value">{{ certificateData!.sku || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Origen Local:</span>
+                  <span class="value">
+                  <i class="pi" [ngClass]="certificateData!.localSource ? 'pi-check text-green-600' : 'pi-times text-red-600'"></i>
+                    {{ certificateData!.localSource ? 'Sí' : 'No' }}
+                </span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Verificado:</span>
+                  <span class="value">
+                  <i class="pi" [ngClass]="certificateData!.verified ? 'pi-check text-green-600' : 'pi-times text-red-600'"></i>
+                    {{ certificateData!.verified ? 'Sí' : 'No' }}
+                </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cerrar"
+        icon="pi pi-times"
+        (click)="closeCertificateModal()"
+        severity="secondary">
+      </p-button>
+    </ng-template>
+  </p-dialog>
 </div>
