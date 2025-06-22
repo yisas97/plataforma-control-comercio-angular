@@ -20,4 +20,5 @@ export interface Product {
 
   producerName?: string; // Nombre del productor
   producerLocation?: string; // Ubicación del productor
+  aiRecommendationScore: any;
 }

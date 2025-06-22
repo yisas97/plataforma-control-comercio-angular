@@ -1,1 +1,271 @@
-<p>recommendations works!</p>
+<div class="recommendations-container p-4 max-w-7xl mx-auto">
+  <p-toast></p-toast>
+
+  <!-- Header -->
+  <div class="mb-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold mb-2">
+          <i class="pi pi-sparkles text-purple-600 mr-2"></i>
+          Recomendaciones Inteligentes
+        </h1>
+        <p class="text-gray-600">
+          Productos seleccionados especialmente para ti usando Inteligencia Artificial
+        </p>
+      </div>
+      <div class="text-right">
+        <p-button
+          label="Volver al Marketplace"
+          icon="pi pi-arrow-left"
+          [outlined]="true"
+          (click)="goToMarketplace()">
+        </p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Status Info -->
+  <p-card class="mb-6 bg-gradient-to-r from-purple-50 to-blue-50">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+        <i class="pi pi-cpu text-purple-600 text-xl"></i>
+      </div>
+      <div class="flex-1">
+        <h3 class="font-semibold text-gray-900">Inteligencia Artificial Activa</h3>
+        <p class="text-sm text-gray-600">
+          Nuestro sistema analiza tu comportamiento y preferencias para ofrecerte las mejores recomendaciones.
+        </p>
+      </div>
+      <div class="text-right">
+            <span class="text-sm text-green-600 font-medium">
+              <i class="pi pi-check-circle mr-1"></i>
+              Sistema funcionando
+            </span>
+      </div>
+    </div>
+  </p-card>
+
+  <!-- Tabs for different recommendation types -->
+  <p-tabView>
+
+    <!-- Personalized Recommendations -->
+    <p-tabPanel header="Para Ti" leftIcon="pi pi-user">
+      <div class="mt-4">
+
+        <!-- User Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6" *ngIf="userStats()">
+          <div class="bg-blue-50 p-4 rounded-lg text-center">
+            <div class="text-2xl font-bold text-blue-600">{{ userStats()?.totalViews || 0 }}</div>
+            <div class="text-sm text-gray-600">Productos Vistos</div>
+          </div>
+          <div class="bg-green-50 p-4 rounded-lg text-center">
+            <div class="text-2xl font-bold text-green-600">{{ userStats()?.totalPurchases || 0 }}</div>
+            <div class="text-sm text-gray-600">Compras Realizadas</div>
+          </div>
+          <div class="bg-purple-50 p-4 rounded-lg text-center">
+            <div class="text-2xl font-bold text-purple-600">{{ userStats()?.favoriteCategory || 'N/A' }}</div>
+            <div class="text-sm text-gray-600">Categoría Favorita</div>
+          </div>
+        </div>
+
+        <!-- Personalized Products -->
+        <div class="recommendations-section">
+          <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+            <i class="pi pi-sparkles text-purple-600"></i>
+            Recomendado Especialmente Para Ti
+            <p-tag value="IA Personalizada" severity="info" [rounded]="true"></p-tag>
+          </h3>
+
+          <div *ngIf="loadingPersonalized()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div *ngFor="let item of [1,2,3,4,5,6]" class="p-4">
+              <p-skeleton height="200px" class="mb-2"></p-skeleton>
+              <p-skeleton height="20px" class="mb-2"></p-skeleton>
+              <p-skeleton height="15px"></p-skeleton>
+            </div>
+          </div>
+
+          <div *ngIf="!loadingPersonalized() && personalizedRecommendations().length === 0"
+               class="text-center p-8 bg-gray-50 rounded-lg">
+            <i class="pi pi-info-circle text-4xl text-gray-400 mb-4"></i>
+            <h4 class="text-lg font-semibold mb-2">¡Explora más para mejores recomendaciones!</h4>
+            <p class="text-gray-600 mb-4">
+              Navega por el marketplace, ve productos y realiza compras para que nuestra IA aprenda tus gustos.
+            </p>
+            <p-button label="Explorar Marketplace"
+                      icon="pi pi-shopping-bag"
+                      (click)="goToMarketplace()">
+            </p-button>
+          </div>
+
+          <div *ngIf="!loadingPersonalized() && personalizedRecommendations().length > 0"
+               class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div *ngFor="let product of personalizedRecommendations()"
+                 class="product-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+              <div class="relative">
+                <img [src]="getProductImage(product)"
+                     [alt]="product.name"
+                     class="w-full h-48 object-cover">
+                <p-tag [value]="getStockStatus(product)"
+                       [severity]="getStockSeverity(product)"
+                       class="absolute top-2 left-2">
+                </p-tag>
+                <div class="absolute top-2 right-2 bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-medium">
+                  IA: {{ getRecommendationScore(product) }}% match
+                </div>
+              </div>
+              <div class="p-4">
+                <h5 class="font-semibold mb-2 hover:text-blue-600 cursor-pointer"
+                    (click)="viewProduct(product.id!)">
+                  {{ product.name }}
+                </h5>
+                <p class="text-sm text-gray-600 mb-2">
+                  <i class="pi pi-shop mr-1"></i>
+                  {{ product.producerName }}
+                </p>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-lg font-bold text-green-600">${{ product.price }}</span>
+                  <div class="flex items-center">
+                    <span class="text-sm font-medium mr-1">{{ product.rating }}</span>
+                    <i class="pi pi-star-fill text-yellow-400"></i>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <p-button icon="pi pi-shopping-cart"
+                            size="small"
+                            [disabled]="!isInStock(product)"
+                            (click)="addToCart(product)"
+                            class="flex-1">
+                  </p-button>
+                  <p-button icon="pi pi-heart"
+                            [outlined]="true"
+                            size="small"
+                            (click)="toggleFavorite(product)">
+                  </p-button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <!-- Popular Recommendations -->
+    <p-tabPanel header="Tendencias" leftIcon="pi pi-chart-line">
+      <div class="mt-4">
+        <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+          <i class="pi pi-trending-up text-orange-600"></i>
+          Lo Más Popular del Momento
+          <p-tag value="Tendencias IA" severity="warning" [rounded]="true"></p-tag>
+        </h3>
+
+        <div *ngIf="loadingPopular()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div *ngFor="let item of [1,2,3,4,5,6,7,8]" class="p-4">
+            <p-skeleton height="150px" class="mb-2"></p-skeleton>
+            <p-skeleton height="15px" class="mb-1"></p-skeleton>
+            <p-skeleton height="12px"></p-skeleton>
+          </div>
+        </div>
+
+        <div *ngIf="!loadingPopular()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div *ngFor="let product of popularRecommendations(); let i = index"
+               class="product-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <div class="relative">
+              <img [src]="getProductImage(product)"
+                   [alt]="product.name"
+                   class="w-full h-40 object-cover">
+              <div class="absolute top-2 left-2 bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-bold">
+                #{{ i + 1 }} Popular
+              </div>
+            </div>
+            <div class="p-3">
+              <h5 class="font-medium mb-1 text-sm hover:text-blue-600 cursor-pointer"
+                  (click)="viewProduct(product.id!)">
+                {{ product.name }}
+              </h5>
+              <p class="text-xs text-gray-600 mb-2">{{ product.producerName }}</p>
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-green-600">${{ product.price }}</span>
+                <p-button icon="pi pi-plus"
+                          size="small"
+                          [disabled]="!isInStock(product)"
+                          (click)="addToCart(product)">
+                </p-button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <!-- Local Producers -->
+    <p-tabPanel header="Productores Locales" leftIcon="pi pi-map-marker">
+      <div class="mt-4">
+        <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+          <i class="pi pi-map-marker text-green-600"></i>
+          Recomendaciones de Tu Área
+          <p-tag value="IA Local" severity="success" [rounded]="true"></p-tag>
+        </h3>
+
+        <div *ngIf="loadingLocal()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div *ngFor="let item of [1,2,3,4,5,6]" class="p-4">
+            <p-skeleton height="180px" class="mb-2"></p-skeleton>
+            <p-skeleton height="18px" class="mb-2"></p-skeleton>
+            <p-skeleton height="14px"></p-skeleton>
+          </div>
+        </div>
+
+        <div *ngIf="!loadingLocal()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div *ngFor="let product of localRecommendations()"
+               class="product-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <div class="relative">
+              <img [src]="getProductImage(product)"
+                   [alt]="product.name"
+                   class="w-full h-44 object-cover">
+              <div class="absolute top-2 left-2 bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">
+                <i class="pi pi-map-marker mr-1"></i>
+                Local
+              </div>
+            </div>
+            <div class="p-4">
+              <h5 class="font-semibold mb-2 hover:text-blue-600 cursor-pointer"
+                  (click)="viewProduct(product.id!)">
+                {{ product.name }}
+              </h5>
+              <p class="text-sm text-green-600 mb-2 font-medium">
+                <i class="pi pi-shop mr-1"></i>
+                {{ product.producerName }}
+              </p>
+              <p class="text-xs text-gray-500 mb-3">
+                📍 {{ product.producerLocation || 'Local' }}
+              </p>
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-lg font-bold text-green-600">${{ product.price }}</span>
+                <span class="text-xs bg-green-50 text-green-700 px-2 py-1 rounded">
+                      Apoyas local
+                    </span>
+              </div>
+              <p-button label="Agregar"
+                        icon="pi pi-shopping-cart"
+                        size="small"
+                        [disabled]="!isInStock(product)"
+                        (click)="addToCart(product)"
+                        class="w-full">
+              </p-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
+
+  </p-tabView>
+
+  <!-- Refresh Button -->
+  <div class="text-center mt-8">
+    <p-button label="Actualizar Recomendaciones"
+              icon="pi pi-refresh"
+              [outlined]="true"
+              (click)="refreshRecommendations()">
+    </p-button>
+  </div>
+
+</div>

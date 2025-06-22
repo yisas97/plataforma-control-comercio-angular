@@ -122,7 +122,7 @@ export class SidebarComponent implements OnInit {
         items: [
           {label: 'Inicio', icon: 'home', route: '/marketplace'},
           {label: 'Catálogo de Productos', icon: 'category', route: '/products'},
-          {label: 'Tiendas/Productores', icon: 'store', route: '/producers'}
+          {label: 'Recomendaciones', icon: 'category', route: '/marketplace/recommendations' },
         ]
       },
       /**

@@ -13,5 +13,10 @@ export  const MARKETPLACE_ROUTE = [
     path: 'purchase-history',
     loadComponent: () => import('./components/purchase-history/purchase-history.component')
       .then(c => c.PurchaseHistoryComponent)
+  },
+  {
+    path: 'recommendations',
+    loadComponent: () => import('./components/recommendations/recommendations.component')
+      .then(c => c.RecommendationsComponent)
   }
 ];

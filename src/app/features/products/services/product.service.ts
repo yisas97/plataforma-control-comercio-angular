@@ -296,6 +296,23 @@ export class ProductService {
     );
   }
 
+  getUserStats(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/products/user/stats`);
+  }
+
+
+
+  getLocalRecommendations(limit: number = 10): Observable<Product[]> {
+    return this.getProducts().pipe(
+      map(products => {
+        const shuffled = products.sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, limit).map(product => ({
+          ...product,
+          producerLocation: product.producerLocation || 'Lima, Perú'
+        }));
+      })
+    );
+  }
 
 
 
