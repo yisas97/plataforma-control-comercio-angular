@@ -1,1 +1,370 @@
-<p>product-detail works!</p>
+<div class="product-detail-container p-4 max-w-7xl mx-auto">
+  <p-toast></p-toast>
+
+  <!-- Breadcrumb -->
+  <div class="mb-4">
+    <nav class="flex" aria-label="Breadcrumb">
+      <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+          <button (click)="goBack()"
+                  class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+            <i class="pi pi-arrow-left mr-2"></i>
+            Marketplace
+          </button>
+        </li>
+        <li>
+          <div class="flex items-center">
+            <i class="pi pi-angle-right text-gray-400 mx-1"></i>
+            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">
+                  {{ product()?.name || 'Producto' }}
+                </span>
+          </div>
+        </li>
+      </ol>
+    </nav>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="text-center p-8">
+    <i class="pi pi-spinner pi-spin text-4xl text-blue-600"></i>
+    <p class="mt-4 text-gray-600">Cargando producto...</p>
+  </div>
+
+  <!-- Product Not Found -->
+  <div *ngIf="!loading() && !product()" class="text-center p-8">
+    <i class="pi pi-exclamation-triangle text-6xl text-red-400 mb-4"></i>
+    <h3 class="text-xl font-semibold mb-2">Producto no encontrado</h3>
+    <p class="text-gray-600 mb-4">El producto que buscas no existe o no está disponible.</p>
+    <p-button label="Volver al Marketplace"
+              icon="pi pi-arrow-left"
+              (click)="goBack()">
+    </p-button>
+  </div>
+
+  <!-- Product Detail Content -->
+  <div *ngIf="!loading() && product()" class="grid grid-cols-12 gap-6">
+
+    <!-- Product Images -->
+    <div class="col-span-12 md:col-span-6">
+      <p-card>
+        <div class="product-images">
+          <!-- Main Image -->
+          <div class="main-image mb-4">
+            <img [src]="getCurrentImage()"
+                 [alt]="product()?.name"
+                 class="w-full h-96 object-cover rounded-lg border">
+
+            <!-- Stock Status Badge -->
+            <p-tag [value]="getStockStatus()"
+                   [severity]="getStockSeverity()"
+                   class="absolute top-4 left-4">
+            </p-tag>
+          </div>
+
+          <!-- Additional Images (if any) -->
+          <div class="image-thumbnails flex gap-2">
+            <div *ngFor="let image of getProductImages(); let i = index"
+                 class="thumbnail cursor-pointer"
+                 [class.active]="selectedImageIndex === i"
+                 (click)="selectImage(i)">
+              <img [src]="image"
+                   [alt]="'Imagen ' + (i + 1)"
+                   class="w-16 h-16 object-cover rounded border hover:border-blue-500">
+            </div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Product Information -->
+    <div class="col-span-12 md:col-span-6">
+      <div class="product-info">
+
+        <!-- Category -->
+        <div class="mb-3">
+          <span class="text-sm text-gray-600 font-medium">{{ product()?.category || 'Sin categoría' }}</span>
+        </div>
+
+        <!-- Product Name -->
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">
+          {{ product()?.name }}
+        </h1>
+
+        <!-- Producer Info -->
+        <div class="producer-info mb-4 p-3 bg-green-50 rounded-lg">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-shop text-green-600"></i>
+            <div>
+              <p class="text-sm text-gray-600">Vendido por:</p>
+              <p class="font-semibold text-green-700">{{ product()?.producerName }}</p>
+              <p class="text-xs text-gray-500" *ngIf="product()?.producerLocation">
+                📍 {{ product()?.producerLocation }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rating -->
+        <div class="rating mb-4 flex items-center gap-2">
+          <div class="flex items-center">
+            <span class="text-lg font-semibold mr-2">{{ product()?.rating || 0 }}</span>
+            <div class="stars">
+              <i *ngFor="let star of getStarArray()"
+                 class="pi pi-star-fill text-yellow-400"></i>
+            </div>
+          </div>
+          <span class="text-sm text-gray-500">({{ getReviewCount() }} reseñas)</span>
+        </div>
+
+        <!-- Price -->
+        <div class="price mb-6">
+              <span class="text-4xl font-bold text-green-600">
+                ${{ product()?.price }}
+              </span>
+          <span class="text-lg text-gray-500 ml-2">por unidad</span>
+        </div>
+
+        <!-- Quantity Selector -->
+        <div class="quantity-selector mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Cantidad:
+          </label>
+          <div class="flex items-center gap-4">
+            <p-inputNumber [(ngModel)]="selectedQuantity"
+                           [min]="1"
+                           [max]="getMaxQuantity()"
+                           [disabled]="!isInStock()"
+                           class="w-24">
+            </p-inputNumber>
+            <span class="text-sm text-gray-500">
+                  {{ product()?.quantity }} disponibles
+                </span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons mb-6">
+          <div class="flex gap-3">
+            <p-button label="Agregar al Carrito"
+                      icon="pi pi-shopping-cart"
+                      [disabled]="!isInStock()"
+                      (click)="addToCart()"
+                      class="flex-1">
+            </p-button>
+
+            <p-button icon="pi pi-heart"
+                      [outlined]="!isFavorite()"
+                      [severity]="isFavorite() ? 'danger' : 'secondary'"
+                      (click)="toggleFavorite()"
+                      pTooltip="Agregar a favoritos">
+            </p-button>
+          </div>
+
+          <div class="mt-3">
+            <p-button label="Comprar Ahora"
+                      icon="pi pi-credit-card"
+                      severity="success"
+                      [disabled]="!isInStock()"
+                      (click)="buyNow()"
+                      class="w-full">
+            </p-button>
+          </div>
+        </div>
+
+        <!-- Blockchain Certificate -->
+        <div class="blockchain-section mb-6">
+          <p-button label="Verificar Autenticidad Blockchain"
+                    icon="pi pi-shield-check"
+                    [outlined]="true"
+                    severity="info"
+                    (click)="showCertificate()"
+                    class="w-full">
+          </p-button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Product Description and Details -->
+    <div class="col-span-12">
+      <p-card>
+        <ng-template pTemplate="header">
+          <h3 class="text-xl font-semibold p-4">Descripción del Producto</h3>
+        </ng-template>
+
+        <div class="product-description">
+          <p class="text-gray-700 leading-relaxed">
+            {{ product()?.description || 'Este producto no tiene descripción disponible.' }}
+          </p>
+
+          <!-- Additional Product Details -->
+          <div class="product-specs mt-6">
+            <h4 class="font-semibold mb-3">Especificaciones:</h4>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <span class="font-medium">SKU:</span>
+                <span class="ml-2 text-gray-600">{{ product()?.id || 'N/A' }}</span>
+              </div>
+              <div>
+                <span class="font-medium">Categoría:</span>
+                <span class="ml-2 text-gray-600">{{ product()?.category || 'Sin categoría' }}</span>
+              </div>
+              <div>
+                <span class="font-medium">Disponibilidad:</span>
+                <span class="ml-2 text-gray-600">{{ product()?.quantity }} unidades</span>
+              </div>
+              <div>
+                <span class="font-medium">Origen:</span>
+                <span class="ml-2 text-gray-600">Local</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Related Products Section -->
+    <div class="col-span-12" *ngIf="relatedProducts().length > 0">
+      <p-card>
+        <ng-template pTemplate="header">
+          <h3 class="text-xl font-semibold p-4">Productos Relacionados</h3>
+        </ng-template>
+
+        <p-carousel [value]="relatedProducts()"
+                    [numVisible]="4"
+                    [numScroll]="1"
+                    [responsiveOptions]="carouselResponsiveOptions">
+          <ng-template let-product pTemplate="item">
+            <div class="product-card m-2 p-3 border rounded">
+              <img [src]="getProductImage(product)"
+                   [alt]="product.name"
+                   class="w-full h-32 object-cover mb-2 rounded">
+              <h5 class="font-medium mb-1">{{ product.name }}</h5>
+              <p class="text-green-600 font-semibold">${{ product.price }}</p>
+              <p-button label="Ver"
+                        size="small"
+                        [outlined]="true"
+                        (click)="viewProduct(product.id!)"
+                        class="w-full mt-2">
+              </p-button>
+            </div>
+          </ng-template>
+        </p-carousel>
+      </p-card>
+    </div>
+
+  </div>
+
+  <!-- Certificate Modal -->
+  <p-dialog header="🔗 Certificado Blockchain"
+            [(visible)]="showCertificateModal"
+            [modal]="true"
+            [style]="{width: '700px'}"
+            [maximizable]="true">
+
+    <!-- Loading state -->
+    <div *ngIf="loadingCertificate" class="text-center p-8">
+      <i class="pi pi-spinner pi-spin text-4xl text-blue-600 mb-4"></i>
+      <p class="text-gray-600">Cargando certificado blockchain...</p>
+    </div>
+
+    <!-- Certificate content -->
+    <div *ngIf="selectedCertificate && !loadingCertificate" class="certificate-content">
+
+      <!-- Verification status -->
+      <div class="verification-status text-center mb-6">
+        <div class="bg-green-100 text-green-800 px-4 py-2 rounded-lg inline-flex items-center gap-2">
+          <i class="pi pi-check-circle"></i>
+          <span class="font-semibold">Producto Verificado</span>
+        </div>
+        <p class="text-sm text-gray-600 mt-2">
+          Este producto ha sido certificado usando tecnología blockchain
+        </p>
+      </div>
+
+      <!-- Certificate details -->
+      <div class="certificate-details">
+        <div class="grid grid-cols-12 gap-4">
+
+          <!-- Hash information -->
+          <div class="col-span-12">
+            <h4 class="font-semibold mb-3 text-gray-800">Información de Certificación</h4>
+          </div>
+
+          <div class="col-span-12 md:col-span-6">
+            <label class="text-sm font-medium text-gray-600">Hash Blockchain:</label>
+            <div class="bg-gray-100 p-2 rounded mt-1 font-mono text-xs break-all">
+              {{ selectedCertificate.blockchainHash }}
+            </div>
+          </div>
+
+          <div class="col-span-12 md:col-span-6">
+            <label class="text-sm font-medium text-gray-600">Hash de Transacción:</label>
+            <div class="bg-gray-100 p-2 rounded mt-1 font-mono text-xs break-all">
+              {{ selectedCertificate.transactionHash }}
+            </div>
+          </div>
+
+          <div class="col-span-12">
+            <label class="text-sm font-medium text-gray-600">Fecha de Certificación:</label>
+            <p class="font-medium">{{ selectedCertificate.createdDate | date:'medium' }}</p>
+          </div>
+
+          <!-- Product information -->
+          <div class="col-span-12" *ngIf="certificateData">
+            <h4 class="font-semibold mb-3 mt-4 text-gray-800">Información del Producto</h4>
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span class="font-medium text-gray-600">Producto:</span>
+                <span class="text-gray-900">{{ certificateData.productName }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-medium text-gray-600">Productor:</span>
+                <span class="text-gray-900">{{ certificateData.producerName }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-medium text-gray-600">Ubicación:</span>
+                <span class="text-gray-900">{{ certificateData.producerLocation }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-medium text-gray-600">SKU:</span>
+                <span class="text-gray-900">{{ certificateData.sku || 'N/A' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-medium text-gray-600">Precio:</span>
+                <span class="text-gray-900">${{ certificateData.price }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-medium text-gray-600">Origen Local:</span>
+                <span class="flex items-center gap-1">
+                      <i class="pi" [ngClass]="certificateData.localSource ? 'pi-check text-green-600' : 'pi-times text-red-600'"></i>
+                      <span [ngClass]="certificateData.localSource ? 'text-green-600' : 'text-red-600'">
+                        {{ certificateData.localSource ? 'Sí' : 'No' }}
+                      </span>
+                    </span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-medium text-gray-600">Verificado:</span>
+                <span class="flex items-center gap-1">
+                      <i class="pi" [ngClass]="certificateData.verified ? 'pi-check text-green-600' : 'pi-times text-red-600'"></i>
+                      <span [ngClass]="certificateData.verified ? 'text-green-600' : 'text-red-600'">
+                        {{ certificateData.verified ? 'Sí' : 'No' }}
+                      </span>
+                    </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button label="Cerrar"
+                icon="pi pi-times"
+                severity="secondary"
+                (click)="closeCertificateModal()">
+      </p-button>
+    </ng-template>
+  </p-dialog>
+
+</div>

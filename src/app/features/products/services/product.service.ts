@@ -224,4 +224,79 @@ export class ProductService {
     );
   }
 
+  getProductDetail(productId: number): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}/marketplace/${productId}/detail`).pipe(
+      map(product => ({
+        ...product,
+        stock: product.quantity,
+        active: true,
+        inventoryStatus: this.getInventoryStatus(product.quantity),
+        rating: product.rating || 4.5,
+        image: product.image || 'product-placeholder.jpg'
+      }))
+    );
+  }
+
+  toggleFavorite(productId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/marketplace/${productId}/favorite`, {});
+  }
+
+  getRelatedProductsByCategory(categoryName: string): Observable<Product[]> {
+    const params = new HttpParams().set('name', categoryName);
+    return this.http.get<Product[]>(`${this.apiUrl}/marketplace/search`, { params }).pipe(
+      map(products => products.map(product => ({
+        ...product,
+        stock: product.quantity,
+        active: true,
+        inventoryStatus: this.getInventoryStatus(product.quantity),
+        rating: product.rating || 4.5,
+        image: product.image || 'product-placeholder.jpg'
+      })))
+    );
+  }
+
+  getRecommendations(limit: number = 10): Observable<Product[]> {
+    const params = new HttpParams().set('limit', limit.toString());
+    return this.http.get<Product[]>(`${this.apiUrl}/recommendations`, { params }).pipe(
+      map(products => products.map(product => ({
+        ...product,
+        stock: product.quantity,
+        active: true,
+        inventoryStatus: this.getInventoryStatus(product.quantity),
+        rating: product.rating || 4.5,
+        image: product.image || 'product-placeholder.jpg'
+      })))
+    );
+  }
+
+  getPopularRecommendations(limit: number = 10): Observable<Product[]> {
+    const params = new HttpParams().set('limit', limit.toString());
+    return this.http.get<Product[]>(`${this.apiUrl}/recommendations/popular`, { params }).pipe(
+      map(products => products.map(product => ({
+        ...product,
+        stock: product.quantity,
+        active: true,
+        inventoryStatus: this.getInventoryStatus(product.quantity),
+        rating: product.rating || 4.5,
+        image: product.image || 'product-placeholder.jpg'
+      })))
+    );
+  }
+
+  getProductByIdQuick(id: number): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}/marketplace/${id}`).pipe(
+      map(product => ({
+        ...product,
+        stock: product.quantity,
+        active: true,
+        inventoryStatus: this.getInventoryStatus(product.quantity),
+        rating: product.rating || 4.5,
+        image: product.image || 'product-placeholder.jpg'
+      }))
+    );
+  }
+
+
+
+
 }

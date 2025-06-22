@@ -201,7 +201,14 @@
                       <div class="flex flex-row md:flex-col justify-between items-start gap-2">
                         <div>
                           <span class="font-medium text-secondary text-sm">{{ item.category }}</span>
-                          <div class="text-lg font-medium text-surface-900 dark:text-surface-0 mt-2">{{ item.name }}</div>
+                          <div class="text-lg font-medium text-surface-900 dark:text-surface-0 mt-2">
+                            <button
+                              class="text-left hover:text-blue-600 hover:underline cursor-pointer bg-transparent border-none p-0 font-medium text-lg"
+                              (click)="viewProductDetail(item.id!)"
+                              [disabled]="!item.id">
+                              {{ item.name }}
+                            </button>
+                          </div>
                           <!-- Información del productor -->
                           <div class="flex items-center gap-1 mt-1">
                             <i class="pi pi-shop text-xs text-green-600"></i>

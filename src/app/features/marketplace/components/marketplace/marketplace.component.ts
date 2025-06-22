@@ -16,6 +16,7 @@ import {Toast, ToastModule} from 'primeng/toast';
 import {CertificateData, ProductCertificate} from '../../../products/model/blockchain.model';
 import {BlockchainService} from '../../../products/services/blockchain.service';
 import {Dialog} from 'primeng/dialog';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-marketplace',
@@ -50,6 +51,7 @@ export class MarketplaceComponent implements OnInit {
   cartService = inject(CartService);
   messageService = inject(MessageService);
   blockchainService = inject(BlockchainService);
+  private router = inject(Router);
 
   showCertificateModal = false;
   selectedCertificate: ProductCertificate | null = null;
@@ -228,5 +230,10 @@ export class MarketplaceComponent implements OnInit {
         });
       }
     });
+  }
+
+  viewProductDetail(productId: number) {
+    console.log(productId);
+    this.router.navigate(['/products', productId]);
   }
 }
