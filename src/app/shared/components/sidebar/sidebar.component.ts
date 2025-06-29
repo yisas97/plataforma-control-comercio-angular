@@ -97,14 +97,9 @@ export class SidebarComponent implements OnInit {
         title: 'Productos',
         items: [
           {
-            label: 'Mis Productos',
+            label: 'Mi Inventario',
             icon: 'inventory',
             route: '/producer/products'
-          },
-          {
-            label: 'Gestión de Inventario',
-            icon: 'add_circle',
-            route: '/producer/inventory'
           }
         ]
       }
