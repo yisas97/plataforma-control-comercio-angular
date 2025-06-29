@@ -55,9 +55,9 @@ export class SidebarComponent implements OnInit {
         title: 'Administración',
         items: [
           {label: 'Dashboard', icon: 'dashboard', route: '/admin/dashboard'},
-          {label: 'Estadísticas', icon: 'bar_chart', route: '/admin/statistics'}
         ]
       },
+      /**
       {
         title: 'Usuarios',
         items: [
@@ -65,6 +65,7 @@ export class SidebarComponent implements OnInit {
           {label: 'Productores Pendientes', icon: 'pending', route: '/admin/producers/pending'}
         ]
       },
+        **/
       {
         title: 'Catálogo',
         items: [
@@ -89,7 +90,6 @@ export class SidebarComponent implements OnInit {
       {
         title: 'Mi Perfil de Tienda',
         items: [
-          {label: 'Información Basica', icon: 'bar_chart', route: '/producer/profile/info'},
           {label: 'Mis Pedidos', icon: 'receipt', route: '/producer/orders'}
         ]
       },
@@ -101,10 +101,6 @@ export class SidebarComponent implements OnInit {
             icon: 'inventory',
             route: '/producer/products'
           },
-          {
-            label: 'Añadir/Editar Productos',
-            icon: 'add_circle',
-            route: '/producer/products/edit/:id'},
           {
             label: 'Gestión de Inventario',
             icon: 'add_circle',
@@ -121,35 +117,15 @@ export class SidebarComponent implements OnInit {
         title: 'MARKETPLACE',
         items: [
           {label: 'Inicio', icon: 'home', route: '/marketplace'},
-          {label: 'Catálogo de Productos', icon: 'category', route: '/products'},
           {label: 'Recomendaciones', icon: 'category', route: '/marketplace/recommendations' },
         ]
       },
-      /**
-      {
-        title: 'MI CUENTA',
-        items: [
-          {label: 'Dashboard', icon: 'dashboard', route: '/client/dashboard'},
-          {label: 'Mi Perfil', icon: 'person', route: '/client/profile'},
-          {label: 'Mis Direcciones', icon: 'location_on', route: '/client/addresses'},
-          {label: 'Métodos de Pago', icon: 'payment', route: '/client/payment-methods'},
-          {label: 'Notificaciones', icon: 'notifications', route: '/client/notifications'}
-        ]
-      },
-        **/
       {
         title: 'COMPRAS',
         items: [
           {label: 'Carrito de Compra', icon: 'shopping_cart', route: '/marketplace/cart'},
           {label: 'Mis Pedidos', icon: 'receipt', route: '/pedidos/order'},
           {label: 'Historial de Compras', icon: 'history', route: '/marketplace/purchase-history'}
-        ]
-      },
-      {
-        title: 'FAVORITOS',
-        items: [
-          {label: 'Mis Favoritos', icon: 'favorite', route: '/client/favorites'},
-          {label: 'Mis Valoraciones', icon: 'star', route: '/client/reviews'}
         ]
       },
     ];
